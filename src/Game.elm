@@ -29,7 +29,7 @@ comments are planned for a future version of this library.
 # Constants
 @docs empty
 
-# Importing Games To and From PGN
+# Converting Games To and From PGN
 @docs fromPgn, toPgn
 
 # Getting the Current Position
