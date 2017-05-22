@@ -53,8 +53,7 @@ init =
 
 
 type Msg
-    = NoOp
-    | SquarePressed Square
+    = SquarePressed Square
     | DoMove Move
     | RotateBoard
     | Back
@@ -64,9 +63,6 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        NoOp ->
-            ( model, Cmd.none )
-
         SquarePressed sq ->
             squarePressed sq model
 
