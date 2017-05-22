@@ -6,13 +6,13 @@ The `SquareFile` data type and related functions and definitions.
 # Types
 @docs SquareFile
 
-# Converting to and from strings and characters
+# Converting to and from Strings and Characters
 @docs fromChar, fromString, toChar, toString
 
-# Miscellaneous useful constants
+# Miscellaneous Useful Constants
 @docs all, a, b, c, d, e, f, g, h
 
-# Miscellaneous functions
+# Miscellaneous Functions
 @docs distance, toIndex
 -}
 

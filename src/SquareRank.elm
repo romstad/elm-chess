@@ -6,13 +6,13 @@ The `SquareRank` data type and related functions and definitions.
 # Types
 @docs SquareRank
 
-# Converting to and from strings and characters
+# Converting to and from Strings and Characters
 @docs fromChar, fromString, toChar, toString
 
-# Miscellaneous useful constants
+# Miscellaneous Useful Constants
 @docs all, one, two, three, four, five, six, seven, eight
 
-# Miscellaneous functions
+# Miscellaneous Functions
 @docs distance, toIndex
 -}
 
