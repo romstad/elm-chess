@@ -24,6 +24,10 @@ main =
         }
 
 
+
+-- MODEL
+
+
 type alias Model =
     Maybe Game
 
