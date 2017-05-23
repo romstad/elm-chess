@@ -5,6 +5,8 @@ module Internal.Game
         , GameResult(..)
         , empty
         , moves
+        , previousMove
+        , nextMove
         , tagValue
         , position
         , goToMove
@@ -103,6 +105,26 @@ moves game =
             |> toEnd
             |> position
             |> movesInternal []
+
+
+{-| The previous move in the game, i.e. the move that resulted in the
+current game position. Returns `Nothing` if we're at the beginning of the
+game.
+-}
+previousMove : Game -> Maybe Move
+previousMove game =
+    game |> position |> Position.lastMove
+
+
+{-| The next move in the game from the current position. Returns `Nothing` if
+we're at the end of the game.
+-}
+nextMove : Game -> Maybe Move
+nextMove game =
+    if isAtEnd game then
+        Nothing
+    else
+        game |> forward |> previousMove
 
 
 {-| Jump to the given game ply number.

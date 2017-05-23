@@ -3,6 +3,9 @@ module Game
         ( Game
         , empty
         , position
+        , moves
+        , previousMove
+        , nextMove
         , goToMove
         , forward
         , fromPgn
@@ -34,6 +37,9 @@ comments are planned for a future version of this library.
 
 # Getting the Current Position
 @docs position
+
+# Getting Game Moves
+@docs moves, previousMove, nextMove
 
 # Navigating in the Game.
 @docs goToMove, forward, back, toBeginning, toEnd, isAtBeginning, isAtEnd
@@ -86,6 +92,36 @@ position game =
     case game of
         Game g ->
             Internal.position g
+
+
+{-| List of all moves in the game.
+-}
+moves : Game -> List Move
+moves game =
+    case game of
+        Game g ->
+            Internal.moves g
+
+
+{-| The previous move in the game, i.e. the move that resulted in the
+current game position. Returns `Nothing` if we're at the beginning of the
+game.
+-}
+previousMove : Game -> Maybe Move
+previousMove game =
+    case game of
+        Game g ->
+            Internal.previousMove g
+
+
+{-| The next move in the game from the current position. Returns `Nothing` if
+we're at the end of the game.
+-}
+nextMove : Game -> Maybe Move
+nextMove game =
+    case game of
+        Game g ->
+            Internal.nextMove g
 
 
 {-| Jump to the given game ply number. If the ply is less than 0, goes to the
