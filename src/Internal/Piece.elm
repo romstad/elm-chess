@@ -5,16 +5,16 @@ module Internal.Piece exposing (..)
 import Array exposing (Array)
 import Bitwise exposing (and, or, shiftLeftBy, shiftRightBy)
 import Char
-import Internal.PieceColor as PC exposing (PieceColor(PieceColor), white, black)
+import Internal.PieceColor as PC exposing (PieceColor(PieceColor), black, white)
 import Internal.PieceType as PT
     exposing
         ( PieceType(PieceType)
-        , pawn
-        , knight
         , bishop
-        , rook
-        , queen
         , king
+        , knight
+        , pawn
+        , queen
+        , rook
         )
 import Internal.Square as Square exposing (Square)
 import Internal.SquareDelta as Delta exposing (SquareDelta)
@@ -192,17 +192,17 @@ attackDelta piece from to =
         deltaMax =
             Delta.unwrap Delta.max
     in
-        Maybe.withDefault
-            Nothing
-            (Array.get
-                ((unwrap piece)
-                    * (2 * deltaMax + 1)
-                    + Square.unwrap to
-                    - Square.unwrap from
-                    + deltaMax
-                )
-                attackDeltas
+    Maybe.withDefault
+        Nothing
+        (Array.get
+            (unwrap piece
+                * (2 * deltaMax + 1)
+                + Square.unwrap to
+                - Square.unwrap from
+                + deltaMax
             )
+            attackDeltas
+        )
 
 
 
@@ -275,10 +275,9 @@ computeAttackDeltas piece =
             List.concatMap
                 (\d ->
                     if isSlider piece then
-                        (List.map
+                        List.map
                             (\d2 -> ( d, d2 ))
                             (Square.possibleDeltasInDirection d)
-                        )
                     else
                         [ ( d, d ) ]
                 )
@@ -287,16 +286,16 @@ computeAttackDeltas piece =
         deltaMax =
             Delta.unwrap Delta.max
     in
-        Array.toList <|
-            List.foldl
-                (\( d0, d ) result ->
-                    Array.set
-                        (deltaMax + (Delta.unwrap d))
-                        (Just d0)
-                        result
-                )
-                (Array.repeat (2 * deltaMax + 1) Nothing)
-                deltasByDirection
+    Array.toList <|
+        List.foldl
+            (\( d0, d ) result ->
+                Array.set
+                    (deltaMax + Delta.unwrap d)
+                    (Just d0)
+                    result
+            )
+            (Array.repeat (2 * deltaMax + 1) Nothing)
+            deltasByDirection
 
 
 attackDeltas : Array (Maybe SquareDelta)

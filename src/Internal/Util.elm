@@ -18,6 +18,7 @@ list contains at least one number >= 100:
 
     sumOfSmall [1, 2, 3] == Just 6
     sumOfSmall [1, 2, 103] == Nothing
+
 -}
 
 

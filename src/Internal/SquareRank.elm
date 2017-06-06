@@ -29,7 +29,7 @@ unwrap rank =
 
 isOutside : SquareRank -> Bool
 isOutside rank =
-    (unwrap rank) < rankMin || (unwrap rank) > rankMax
+    unwrap rank < rankMin || unwrap rank > rankMax
 
 
 
@@ -52,10 +52,10 @@ fromChar char =
         r =
             Char.toCode char - Char.toCode '1'
     in
-        if r >= 0 && r < rankCount then
-            Just (SquareRank (r + rankMin))
-        else
-            Nothing
+    if r >= 0 && r < rankCount then
+        Just (SquareRank (r + rankMin))
+    else
+        Nothing
 
 
 fromString : String -> Maybe SquareRank
@@ -78,7 +78,7 @@ all =
 
 distance : SquareRank -> SquareRank -> Int
 distance rank0 rank1 =
-    abs (unwrap rank1) - (unwrap rank0)
+    abs (unwrap rank1) - unwrap rank0
 
 
 
@@ -98,7 +98,7 @@ toIndex rank =
 
 one : SquareRank
 one =
-    SquareRank (rankMin)
+    SquareRank rankMin
 
 
 two : SquareRank

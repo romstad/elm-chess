@@ -12,6 +12,7 @@ functions. You should almost certainly not use this in any external code.
 
     unwrap white == 0
     unwrap black == 1
+
 -}
 unwrap : PieceColor -> Int
 unwrap color =
@@ -63,10 +64,11 @@ black.
 
     opposite white == black
     opposite black == white
+
 -}
 opposite : PieceColor -> PieceColor
 opposite =
-    unwrap >> (Bitwise.xor 1) >> PieceColor
+    unwrap >> Bitwise.xor 1 >> PieceColor
 
 
 {-| Convert a PieceColor to a char of the form used when representing a board
@@ -74,6 +76,7 @@ in Forsyth-Edwards notation.
 
     toChar white == 'w'
     toChar black == 'b'
+
 -}
 toChar : PieceColor -> Char
 toChar color =
@@ -90,6 +93,7 @@ board in Forsyth-Edwards notation.
 
     toChar white == "w"
     toChar black == "b"
+
 -}
 toString : PieceColor -> String
 toString =
@@ -98,9 +102,9 @@ toString =
 
 {-| Tries to convert a character to a PieceColor, using Forsyth-Edwards
 encoding.
-    fromChar 'w' == Just white
-    fromChar 'b' == Just black
-    fromChar ch == Nothing -- for all ch not equal to 'w' or 'b'
+fromChar 'w' == Just white
+fromChar 'b' == Just black
+fromChar ch == Nothing -- for all ch not equal to 'w' or 'b'
 -}
 fromChar : Char -> Maybe PieceColor
 fromChar char =
@@ -114,9 +118,9 @@ fromChar char =
 
 {-| Tries to convert a string to a PieceColor, using Forsyth-Edwards
 encoding.
-    fromString "w" == Just white
-    fromString "b" == Just black
-    fromString str == Nothing -- for all str not starting with "w" or "b"
+fromString "w" == Just white
+fromString "b" == Just black
+fromString str == Nothing -- for all str not starting with "w" or "b"
 -}
 fromString : String -> Maybe PieceColor
 fromString string =

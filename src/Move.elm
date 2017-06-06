@@ -1,17 +1,23 @@
 module Move exposing (..)
 
-{-|
-The `Move` and `Variation` data types, and miscellaneus functions
+{-| The `Move` and `Variation` data types, and miscellaneus functions
 operating on moves.
 
+
 # Types
+
 @docs Move, Variation
 
+
 # Extracting Properties of Moves
+
 @docs from, to, promotion, isPromotion, isCastle, isKingsideCastle, isQueensideCastle, isEp
 
+
 # Converting Moves to UCI Notation
+
 @docs toUci
+
 -}
 
 import Internal.Move as Internal

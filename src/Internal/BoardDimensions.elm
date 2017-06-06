@@ -6,6 +6,7 @@ attack generation, and so on.
 
 @docs fileCount, rankCount, fileMin, fileMax, rankMin, rankMax,
 squareMin, squareMax, extendedFileCount, extendedBoardSize
+
 -}
 
 
@@ -75,7 +76,7 @@ extendedFileCount =
 
 
 {-| The number of squares on the "extended" board, containing a wide frame
-   on all sides to assist us in edge detection.
+on all sides to assist us in edge detection.
 -}
 extendedBoardSize : Int
 extendedBoardSize =

@@ -1,22 +1,32 @@
 module Square exposing (..)
 
-{-|
-The `Square` data type and related functions and definitions.
+{-| The `Square` data type and related functions and definitions.
+
 
 # Types
+
 @docs Square
 
+
 # Manipulating Squares
+
 @docs make, file, rank
 
+
 # Converting to and from Strings and Ints
+
 @docs fromString, toString, fromInt, toInt
 
+
 # Distances between Squares
+
 @docs fileDistance, rankDistance, distance
 
+
 # Useful Constants
+
 @docs all, a1, b1, c1, d1, e1, f1, g1, h1, a2, b2, c2, d2, e2, f2, g2, h2, a3, b3, c3, d3, e3, f3, g3, h3, a4, b4, c4, d4, e4, f4, g4, h4, a5, b5, c5, d5, e5, f5, g5, h5, a6, b6, c6, d6, e6, f6, g6, h6, a7, b7, c7, d7, e7, f7, g7, h7, a8, b8, c8, d8, e8, f8, g8, h8
+
 -}
 
 import Internal.Square as Internal
@@ -54,6 +64,7 @@ rank =
 {-| Converts a `Square` to a `String` in standard algebraic notation
 
     toString e4 == "e4"
+
 -}
 toString : Square -> String
 toString =
@@ -67,6 +78,7 @@ string, returns `Nothing`.
     fromString "g8" == Just g8
     fromString "b1d3" == Just b1
     fromString "Donald Trump" == Nothing
+
 -}
 fromString : String -> Maybe Square
 fromString =
@@ -80,6 +92,7 @@ a1 <-> 0, b1 <-> 1, ..., h8 <-> 63.
     toInt b1 == 1
     toInt a2 == 8
     toInt h8 == 63
+
 -}
 toInt : Square -> Int
 toInt =
@@ -94,6 +107,7 @@ b1 <-> 1, ..., h8 <-> 63.
     fromInt 63 == Just h8
     fromInt -1 == Nothing
     fromInt 100 == Nothing
+
 -}
 fromInt : Int -> Maybe Square
 fromInt i =
@@ -108,6 +122,7 @@ fromInt i =
     fileDistance a1 d3 == 3
     fileDistance c1 c7 == 0
     fileDistance h8 a3 == 7
+
 -}
 fileDistance : Square -> Square -> Int
 fileDistance =
@@ -119,6 +134,7 @@ fileDistance =
     rankDistance a1 b4 == 3
     rankDistance c2 h2 == 0
     rankDistance a8 c1 == 7
+
 -}
 rankDistance : Square -> Square -> Int
 rankDistance =
@@ -132,6 +148,7 @@ one square to the other on an empty board.
     distance a1 b4 == 3
     distance h8 b1 == 7
     distance f3 e4 == 1
+
 -}
 distance : Square -> Square -> Int
 distance =

@@ -3,14 +3,21 @@ module PieceType exposing (..)
 {-| This module defines the `PieceType` type and related functions. A
 `PieceType` value is basically an uncolored chess piece.
 
+
 # Types
+
 @docs PieceType
 
+
 # Useful Constants
+
 @docs pawn, knight, bishop, rook, queen, king, all, promotionPieces
 
+
 # Conversion to and from Strings and Chars
+
 @docs fromChar, fromString, toChar, toString
+
 -}
 
 import Internal.PieceType as Internal
@@ -67,7 +74,9 @@ king =
 
 {-| List of all piece types.
 
-    all = [ pawn, knight, bishop, rook, queen, king ]
+    all =
+        [ pawn, knight, bishop, rook, queen, king ]
+
 -}
 all : List PieceType
 all =
@@ -76,7 +85,9 @@ all =
 
 {-| List of all piece types to which a pawn can promote.
 
-    promotionPieces = [ queen, rook, bishop, knight ]
+    promotionPieces =
+        [ queen, rook, bishop, knight ]
+
 -}
 promotionPieces : List PieceType
 promotionPieces =
@@ -92,6 +103,7 @@ algebraic notation.
     toChar rook == 'R'
     toChar queen == 'Q'
     toChar king == 'K'
+
 -}
 toChar : PieceType -> Char
 toChar =
@@ -107,6 +119,7 @@ corresponding piece letter used in English algebraic notation.
     toString rook == "R"
     toString queen == "Q"
     toString king == "K"
+
 -}
 toString : PieceType -> String
 toString =
@@ -120,6 +133,7 @@ piece letters used in English algebraic notation.
     fromChar 'P' == Just pawn
     fromChar 'r' == Just rook
     fromChar 'x' == Nothing
+
 -}
 fromChar : Char -> Maybe PieceType
 fromChar =
@@ -134,6 +148,7 @@ algebraic notation.
     fromString "k" == Just king
     fromString "Qa4+" == Just queen
     fromString "x" == Nothing
+
 -}
 fromString : String -> Maybe PieceType
 fromString =

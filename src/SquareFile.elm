@@ -1,19 +1,27 @@
 module SquareFile exposing (..)
 
-{-|
-The `SquareFile` data type and related functions and definitions.
+{-| The `SquareFile` data type and related functions and definitions.
+
 
 # Types
+
 @docs SquareFile
 
+
 # Converting to and from Strings and Characters
+
 @docs fromChar, fromString, toChar, toString
 
+
 # Miscellaneous Useful Constants
+
 @docs all, a, b, c, d, e, f, g, h
 
+
 # Miscellaneous Functions
+
 @docs distance, toIndex
+
 -}
 
 import Internal.SquareFile as Internal
@@ -30,6 +38,7 @@ type alias SquareFile =
 
     toChar c == 'c'
     List.map toChar all == [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' ]
+
 -}
 toChar : SquareFile -> Char
 toChar =
@@ -41,6 +50,7 @@ letter in the range a-h.
 
     toString c == "c"
     List.map toString all == [ "a", "b", "c", "d", "e", "f", "g", "h" ]
+
 -}
 toString : SquareFile -> String
 toString =
@@ -52,6 +62,7 @@ character is not a lowercase letter in the range a-h.
 
     fromChar 'e' == Just e
     List.map fromChar ['a', 'x', 'h'] == [ Just a, Nothing, Just h ]
+
 -}
 fromChar : Char -> Maybe SquareFile
 fromChar =
@@ -64,6 +75,7 @@ lowercase letter in the range a-h.
 
     fromString "e" == Just e
     List.map fromChar ["a", "x", "h"] == [ Just a, Nothing, Just h ]
+
 -}
 fromString : String -> Maybe SquareFile
 fromString =
@@ -137,6 +149,7 @@ h =
 
     distance a h == 7
     distance e c == 2
+
 -}
 distance : SquareFile -> SquareFile -> Int
 distance =

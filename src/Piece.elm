@@ -1,17 +1,27 @@
 module Piece exposing (..)
 
 {-|
+
+
 # Types
+
 @docs Piece
 
+
 # Creating and Manipulating Pieces
+
 @docs make, color, kind
 
+
 # Useful Constants
+
 @docs all, whitePawn, whiteKnight, whiteBishop, whiteRook, whiteQueen, whiteKing, blackPawn, blackKnight, blackBishop, blackRook, blackQueen, blackKing
 
+
 # Converting Pieces to/from Chars and Strings
+
 @docs fromChar, fromString, toChar, toString
+
 -}
 
 import Internal.Piece as Internal
@@ -30,6 +40,7 @@ type alias Piece =
 
     make PieceColor.white PieceType.queen == whiteQueen
     make PieceColor.black PieceType.knight == blackKnight
+
 -}
 make : PieceColor -> PieceType -> Piece
 make =
@@ -40,6 +51,7 @@ make =
 
     color whiteBishop == PieceColor.white
     color blackQueen == PieceColor.black
+
 -}
 color : Piece -> PieceColor
 color =
@@ -51,6 +63,7 @@ have to use an awkward name.
 
     kind whiteBishop == PieceType.bishop
     kind blackQueen == PieceType.queen
+
 -}
 kind : Piece -> PieceType
 kind =
@@ -62,6 +75,7 @@ White pieces become uppercase letters, black pieces become lowercase letters.
 
     toChar whiteRook == 'R'
     toChar blackQueen == 'q'
+
 -}
 toChar : Piece -> Char
 toChar =
@@ -74,6 +88,7 @@ uppercase letters, black pieces become lowercase letters.
 
     toString whiteRook == "R"
     toString blackQueen == "q"
+
 -}
 toString : Piece -> String
 toString =
@@ -87,6 +102,7 @@ If the character is not a valid piece letter, returns `Nothing`.
     fromChar 'R' == Just whiteRook
     fromChar 'q' == Just blackQueen
     fromChar 'x' == Nothing
+
 -}
 fromChar : Char -> Maybe Piece
 fromChar =
@@ -102,6 +118,7 @@ if the string is empty, returns `Nothing`.
     fromString "Kbb" == Just whiteKing
     fromString "q" == Just blackQueen
     fromString "x" == Nothing
+
 -}
 fromString : String -> Maybe Piece
 fromString =

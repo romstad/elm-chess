@@ -18,14 +18,14 @@ fromSan string position =
         str =
             String.filter isImportantCharacter string
     in
-        if str == "O-O" then
-            kingsideCastlingFromSan position
-        else if str == "O-O-O" then
-            queensideCastlingFromSan position
-        else if isPieceCharacter (String.left 1 str) then
-            pieceMoveFromSan str position
-        else
-            pawnMoveFromSan str position
+    if str == "O-O" then
+        kingsideCastlingFromSan position
+    else if str == "O-O-O" then
+        queensideCastlingFromSan position
+    else if isPieceCharacter (String.left 1 str) then
+        pieceMoveFromSan str position
+    else
+        pawnMoveFromSan str position
 
 
 {-| Converts a move to a string in short algebraic notation .
@@ -41,17 +41,18 @@ toSan move position =
             piece =
                 Position.pieceOn (Move.from move) position
         in
-            if Piece.kind piece == PieceType.pawn then
-                pawnMoveToSan move position
-            else
-                pieceMoveToSan move position
+        if Piece.kind piece == PieceType.pawn then
+            pawnMoveToSan move position
+        else
+            pieceMoveToSan move position
     )
-        ++ if Position.moveGivesCheckmate move position then
-            "#"
-           else if Position.moveGivesCheck move position then
-            "+"
-           else
-            ""
+        ++ (if Position.moveGivesCheckmate move position then
+                "#"
+            else if Position.moveGivesCheck move position then
+                "+"
+            else
+                ""
+           )
 
 
 {-| Exports a variation to a string with move numbers and moves in short
@@ -60,7 +61,7 @@ algebraic notation.
 variationToSan : Variation -> Position -> String
 variationToSan variation position =
     (if Position.sideToMove position == black then
-        (toString (Position.moveNumber position) ++ "... ")
+        toString (Position.moveNumber position) ++ "... "
      else
         ""
     )
@@ -70,7 +71,7 @@ variationToSan variation position =
                         ( str
                             ++ " "
                             ++ (if Position.sideToMove pos == white then
-                                    (toString (Position.moveNumber pos) ++ ". ")
+                                    toString (Position.moveNumber pos) ++ ". "
                                 else
                                     ""
                                )
@@ -97,17 +98,17 @@ fromUci string position =
         promotion =
             PieceType.fromString (String.dropLeft 4 string)
     in
-        case from of
-            Nothing ->
-                Nothing
+    case from of
+        Nothing ->
+            Nothing
 
-            Just from ->
-                case to of
-                    Nothing ->
-                        Nothing
+        Just from ->
+            case to of
+                Nothing ->
+                    Nothing
 
-                    Just to ->
-                        findMove from to promotion position
+                Just to ->
+                    findMove from to promotion position
 
 
 {-| Convert a move to a string in Universal Chess Interface notation.
@@ -127,14 +128,14 @@ pieceMoveToSan move position =
         piece =
             Position.pieceOn (Move.from move) position
     in
-        String.toUpper (Piece.toString piece)
-            ++ disambiguation piece move position
-            ++ (if Position.isEmpty (Move.to move) position then
-                    ""
-                else
-                    "x"
-               )
-            ++ Square.toString (Move.to move)
+    String.toUpper (Piece.toString piece)
+        ++ disambiguation piece move position
+        ++ (if Position.isEmpty (Move.to move) position then
+                ""
+            else
+                "x"
+           )
+        ++ Square.toString (Move.to move)
 
 
 pawnMoveToSan : Move -> Position -> String
@@ -149,19 +150,19 @@ pawnMoveToSan move position =
         promotion =
             Move.promotion move
     in
-        (if Square.file from /= Square.file to then
-            File.toString (Square.file from) ++ "x"
-         else
-            ""
-        )
-            ++ Square.toString to
-            ++ (case promotion of
-                    Nothing ->
-                        ""
+    (if Square.file from /= Square.file to then
+        File.toString (Square.file from) ++ "x"
+     else
+        ""
+    )
+        ++ Square.toString to
+        ++ (case promotion of
+                Nothing ->
+                    ""
 
-                    Just promotion ->
-                        "=" ++ String.toUpper (PieceType.toString promotion)
-               )
+                Just promotion ->
+                    "=" ++ String.toUpper (PieceType.toString promotion)
+           )
 
 
 disambiguation : Piece -> Move -> Position -> String
@@ -170,14 +171,14 @@ disambiguation piece move position =
         moves =
             Position.movesTo (Piece.kind piece) (Move.to move) position
     in
-        if List.length moves <= 1 then
-            ""
-        else if List.all (differentFileFrom move) moves then
-            (move |> Move.from |> Square.file |> File.toString)
-        else if List.all (differentRankFrom move) moves then
-            (move |> Move.from |> Square.rank |> Rank.toString)
-        else
-            (move |> Move.from |> Square.toString)
+    if List.length moves <= 1 then
+        ""
+    else if List.all (differentFileFrom move) moves then
+        move |> Move.from |> Square.file |> File.toString
+    else if List.all (differentRankFrom move) moves then
+        move |> Move.from |> Square.rank |> Rank.toString
+    else
+        move |> Move.from |> Square.toString
 
 
 differentFileFrom : Move -> Move -> Bool
@@ -230,17 +231,17 @@ pieceMoveFromSan str position =
         disambig =
             str |> String.dropLeft 1 |> String.dropRight 2
     in
-        case kind of
-            Nothing ->
-                Nothing
+    case kind of
+        Nothing ->
+            Nothing
 
-            Just kind ->
-                case to of
-                    Nothing ->
-                        Nothing
+        Just kind ->
+            case to of
+                Nothing ->
+                    Nothing
 
-                    Just to ->
-                        findPieceMove kind to disambig position
+                Just to ->
+                    findPieceMove kind to disambig position
 
 
 findPieceMove : PieceType -> Square -> String -> Position -> Maybe Move
@@ -255,24 +256,24 @@ findPieceMove kind to disambig position =
         ranks =
             List.filterMap Rank.fromChar dis
     in
-        if List.length files > 1 || List.length ranks > 1 then
-            Nothing
+    if List.length files > 1 || List.length ranks > 1 then
+        Nothing
+    else
+        let
+            file =
+                List.head files
+
+            rank =
+                List.head ranks
+
+            candidates =
+                Position.movesTo kind to position
+                    |> List.filter (match kind to file rank)
+        in
+        if List.length candidates == 1 then
+            List.head candidates
         else
-            let
-                file =
-                    List.head files
-
-                rank =
-                    List.head ranks
-
-                candidates =
-                    Position.movesTo kind to position
-                        |> List.filter (match kind to file rank)
-            in
-                if List.length candidates == 1 then
-                    List.head candidates
-                else
-                    Nothing
+            Nothing
 
 
 match :
@@ -323,12 +324,12 @@ pawnMoveFromSan string position =
                 |> List.filterMap File.fromChar
                 |> List.head
     in
-        case to of
-            Nothing ->
-                Nothing
+    case to of
+        Nothing ->
+            Nothing
 
-            Just to ->
-                findPawnMove to promotion file position
+        Just to ->
+            findPawnMove to promotion file position
 
 
 findPawnMove :
@@ -343,10 +344,10 @@ findPawnMove to promotion fromFile position =
             Position.movesTo PieceType.pawn to position
                 |> List.filter (pawnMatch promotion fromFile)
     in
-        if List.length candidates == 1 then
-            List.head candidates
-        else
-            Nothing
+    if List.length candidates == 1 then
+        List.head candidates
+    else
+        Nothing
 
 
 pawnMatch : Maybe PieceType -> Maybe SquareFile -> Move -> Bool

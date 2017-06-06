@@ -3,17 +3,26 @@ module Internal.PieceType exposing (..)
 {-| This module defines the PieceType type and related functions. A
 PieceType value is basically an uncolored chess piece.
 
+
 # Types
+
 @docs PieceType
 
+
 # Common Constants
+
 @docs none, pawn, knight, bishop, rook, queen, king, all, promotionPieces
 
+
 # Properties of Pieces
+
 @docs isSlider
 
+
 # Conversion to and from Strings and Characters
+
 @docs fromChar, fromString, toChar, toString
+
 -}
 
 import Char
@@ -33,6 +42,7 @@ code.
     unwrap rook = 4
     unwrap queen = 5
     unwrap king = 6
+
 -}
 unwrap : PieceType -> Int
 unwrap kind =
@@ -93,7 +103,9 @@ king =
 
 {-| List of all "real" piece types.
 
-    all = [ pawn, knight, bishop, rook, queen, king ]
+    all =
+        [ pawn, knight, bishop, rook, queen, king ]
+
 -}
 all : List PieceType
 all =
@@ -103,6 +115,7 @@ all =
 {-| The piece types to which a pawn can promote when reaching the last rank.
 
     promotionPieces == [ queen, knight, rook, bishop ]
+
 -}
 promotionPieces : List PieceType
 promotionPieces =
@@ -114,6 +127,7 @@ multiple squares in the same direction as long as the path is unobstructed.
 
     isSlider knight == False
     isSlider rook = True
+
 -}
 isSlider : PieceType -> Bool
 isSlider kind =
@@ -129,6 +143,7 @@ algebraic notation.
     toChar rook == 'R'
     toChar queen == 'Q'
     toChar king == 'K'
+
 -}
 toChar : PieceType -> Char
 toChar kind =
@@ -157,6 +172,7 @@ corresponding piece letter used in English algebraic notation.
     toString rook == "R"
     toString queen == "Q"
     toString king == "K"
+
 -}
 toString : PieceType -> String
 toString =
@@ -170,6 +186,7 @@ piece letters used in English algebraic notation.
     fromChar 'P' == Just pawn
     fromChar 'r' == Just rook
     fromChar 'x' == Nothing
+
 -}
 fromChar : Char -> Maybe PieceType
 fromChar char =
@@ -177,20 +194,20 @@ fromChar char =
         ch =
             Char.toUpper char
     in
-        if ch == 'P' then
-            Just pawn
-        else if ch == 'N' then
-            Just knight
-        else if ch == 'B' then
-            Just bishop
-        else if ch == 'R' then
-            Just rook
-        else if ch == 'Q' then
-            Just queen
-        else if ch == 'K' then
-            Just king
-        else
-            Nothing
+    if ch == 'P' then
+        Just pawn
+    else if ch == 'N' then
+        Just knight
+    else if ch == 'B' then
+        Just bishop
+    else if ch == 'R' then
+        Just rook
+    else if ch == 'Q' then
+        Just queen
+    else if ch == 'K' then
+        Just king
+    else
+        Nothing
 
 
 {-| Tries to convert a string to a PieceType, based on the first character
@@ -201,6 +218,7 @@ algebraic notation.
     fromString "k" == Just king
     fromString "Qa4+" == Just queen
     fromString "x" == Nothing
+
 -}
 fromString : String -> Maybe PieceType
 fromString string =

@@ -1,19 +1,27 @@
 module SquareRank exposing (..)
 
-{-|
-The `SquareRank` data type and related functions and definitions.
+{-| The `SquareRank` data type and related functions and definitions.
+
 
 # Types
+
 @docs SquareRank
 
+
 # Converting to and from Strings and Characters
+
 @docs fromChar, fromString, toChar, toString
 
+
 # Miscellaneous Useful Constants
+
 @docs all, one, two, three, four, five, six, seven, eight
 
+
 # Miscellaneous Functions
+
 @docs distance, toIndex
+
 -}
 
 import Internal.SquareRank as Internal
@@ -30,6 +38,7 @@ type alias SquareRank =
 
     toChar three == '3'
     List.map toChar all == [ '1', '2', '3', '4', '5', '6', '7', '8' ]
+
 -}
 toChar : SquareRank -> Char
 toChar =
@@ -41,6 +50,7 @@ letter in the range 1-8.
 
     toString three == "3"
     List.map toString all == [ "1", "2", "3", "4", "5", "6", "7", "8" ]
+
 -}
 toString : SquareRank -> String
 toString =
@@ -52,6 +62,7 @@ character is not a digit in the range 1-8.
 
     fromChar '5' == Just five
     List.map fromChar ['1', 'x', '8'] == [ Just one, Nothing, Just eight ]
+
 -}
 fromChar : Char -> Maybe SquareRank
 fromChar =
@@ -64,6 +75,7 @@ digit in the range 1-8.
 
     fromChar '5' == Just five
     List.map fromChar ['1', 'x', '8'] == [ Just one, Nothing, Just eight ]
+
 -}
 fromString : String -> Maybe SquareRank
 fromString =
@@ -137,6 +149,7 @@ eight =
 
     distance one eight == 7
     distance five three == 2
+
 -}
 distance : SquareRank -> SquareRank -> Int
 distance =

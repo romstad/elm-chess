@@ -38,13 +38,12 @@ type alias Board =
 
 empty : Board
 empty =
-    (List.foldl
+    List.foldl
         (\s b ->
             Array.set (Square.unwrap s) Piece.empty b
         )
         (Array.fromList (List.repeat extendedBoardSize Piece.outside))
         Square.all
-    )
 
 
 
@@ -85,38 +84,38 @@ doMove move board =
         to =
             Move.to move
     in
-        case Move.promotion move of
-            Nothing ->
-                if Move.isKingsideCastle move then
-                    board
-                        |> movePiece from to
-                        |> movePiece
-                            (Square.add to Delta.e)
-                            (Square.add from Delta.e)
-                else if Move.isQueensideCastle move then
-                    board
-                        |> movePiece from to
-                        |> movePiece
-                            (Square.add to (Delta.multiply 2 Delta.w))
-                            (Square.add from Delta.w)
-                else if Move.isEp move then
-                    let
-                        fromRank =
-                            Square.rank from
-
-                        toFile =
-                            Square.file to
-                    in
-                        board
-                            |> movePiece from to
-                            |> removePiece (Square.make toFile fromRank)
-                else
-                    movePiece from to board
-
-            Just kind ->
+    case Move.promotion move of
+        Nothing ->
+            if Move.isKingsideCastle move then
                 board
-                    |> removePiece from
-                    |> putPiece (Piece.make us kind) to
+                    |> movePiece from to
+                    |> movePiece
+                        (Square.add to Delta.e)
+                        (Square.add from Delta.e)
+            else if Move.isQueensideCastle move then
+                board
+                    |> movePiece from to
+                    |> movePiece
+                        (Square.add to (Delta.multiply 2 Delta.w))
+                        (Square.add from Delta.w)
+            else if Move.isEp move then
+                let
+                    fromRank =
+                        Square.rank from
+
+                    toFile =
+                        Square.file to
+                in
+                board
+                    |> movePiece from to
+                    |> removePiece (Square.make toFile fromRank)
+            else
+                movePiece from to board
+
+        Just kind ->
+            board
+                |> removePiece from
+                |> putPiece (Piece.make us kind) to
 
 
 
@@ -154,9 +153,9 @@ movePiece from to board =
         piece =
             pieceOn from board
     in
-        board
-            |> removePiece from
-            |> putPiece piece to
+    board
+        |> removePiece from
+        |> putPiece piece to
 
 
 
@@ -204,7 +203,7 @@ scan board square delta =
             else
                 scanInternal (Square.add s delta)
     in
-        scanInternal (Square.add square delta)
+    scanInternal (Square.add square delta)
 
 
 
@@ -222,7 +221,7 @@ lineIsClear board square0 square1 delta =
                         && lineIsClearInternal (Square.add s0 delta) s1
                    )
     in
-        lineIsClearInternal (Square.add square0 delta) square1
+    lineIsClearInternal (Square.add square0 delta) square1
 
 
 
@@ -235,15 +234,15 @@ pieceAttacksSquare from to board =
         piece =
             pieceOn from board
     in
-        case (Piece.attackDelta piece from to) of
-            Nothing ->
-                False
+    case Piece.attackDelta piece from to of
+        Nothing ->
+            False
 
-            Just delta ->
-                if Piece.isSlider piece then
-                    lineIsClear board from to delta
-                else
-                    True
+        Just delta ->
+            if Piece.isSlider piece then
+                lineIsClear board from to delta
+            else
+                True
 
 
 
@@ -255,7 +254,7 @@ sideAttacksSquare side square board =
     List.any
         (\s ->
             (Piece.color (pieceOn s board) == side)
-                && (pieceAttacksSquare s square board)
+                && pieceAttacksSquare s square board
         )
         Square.all
 
@@ -281,7 +280,7 @@ readFenPiece piece state =
 
 processFenChar : Char -> ReadFenState -> ReadFenState
 processFenChar char state =
-    case (Piece.fromChar char) of
+    case Piece.fromChar char of
         Just piece ->
             { state
                 | board = readFenPiece piece state
@@ -328,7 +327,7 @@ writeFenPiece piece state =
     else if state.skip > 0 then
         { string =
             state.string
-                ++ (Basics.toString state.skip)
+                ++ Basics.toString state.skip
                 ++ Piece.toString piece
         , skip = 0
         }
@@ -341,7 +340,7 @@ writeFenPiece piece state =
 fenNextRank : WriteFenState -> WriteFenState
 fenNextRank state =
     if state.skip > 0 then
-        { string = state.string ++ (Basics.toString state.skip) ++ "/"
+        { string = state.string ++ Basics.toString state.skip ++ "/"
         , skip = 0
         }
     else
@@ -353,7 +352,7 @@ fenNextRank state =
 fenDone : WriteFenState -> WriteFenState
 fenDone state =
     if state.skip > 0 then
-        { string = state.string ++ (Basics.toString state.skip)
+        { string = state.string ++ Basics.toString state.skip
         , skip = 0
         }
     else

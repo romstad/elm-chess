@@ -29,7 +29,7 @@ unwrap file =
 
 isOutside : SquareFile -> Bool
 isOutside file =
-    (unwrap file) < fileMin || (unwrap file) > fileMax
+    unwrap file < fileMin || unwrap file > fileMax
 
 
 
@@ -52,10 +52,10 @@ fromChar char =
         f =
             Char.toCode char - Char.toCode 'a'
     in
-        if f >= 0 && f < fileCount then
-            Just (SquareFile (f + fileMin))
-        else
-            Nothing
+    if f >= 0 && f < fileCount then
+        Just (SquareFile (f + fileMin))
+    else
+        Nothing
 
 
 fromString : String -> Maybe SquareFile
@@ -78,7 +78,7 @@ all =
 
 distance : SquareFile -> SquareFile -> Int
 distance file0 file1 =
-    abs (unwrap file1) - (unwrap file0)
+    abs (unwrap file1) - unwrap file0
 
 
 
@@ -98,7 +98,7 @@ toIndex file =
 
 a : SquareFile
 a =
-    SquareFile (fileMin)
+    SquareFile fileMin
 
 
 b : SquareFile

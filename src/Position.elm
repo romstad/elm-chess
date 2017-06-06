@@ -1,23 +1,33 @@
 module Position exposing (..)
 
-{-|
-This module defines the `Position` data type, which is used to model
+{-| This module defines the `Position` data type, which is used to model
 chess positions.
 
+
 # Types
+
 @docs Position
 
+
 # Useful Constants
+
 @docs initial
 
+
 # Properties of Positions
+
 @docs sideToMove, pieceOn, colorOn, isEmpty, epSquare, moveNumber, sideAttacksSquare, isCheck, isCheckmate
 
+
 # Generating and Making Moves
+
 @docs moves, movesFrom, doMove
 
+
 # Converting to and from UCI/FEN Strings
+
 @docs fromFen, toFen, toUci
+
 -}
 
 import Internal.Piece
@@ -56,10 +66,10 @@ pieceOn square pos =
         p =
             Internal.pieceOn square pos
     in
-        if p == Internal.Piece.empty || p == Internal.Piece.outside then
-            Nothing
-        else
-            Just p
+    if p == Internal.Piece.empty || p == Internal.Piece.outside then
+        Nothing
+    else
+        Just p
 
 
 {-| The color of the piece on the given square, or `Nothing` if the square is

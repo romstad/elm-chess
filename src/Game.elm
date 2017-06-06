@@ -1,51 +1,65 @@
 module Game
     exposing
         ( Game
+        , addMove
+        , back
         , empty
-        , position
-        , moves
-        , previousMove
-        , nextMove
-        , goToMove
         , forward
         , fromPgn
-        , toPgn
-        , back
-        , toBeginning
-        , toEnd
+        , goToMove
         , isAtBeginning
         , isAtEnd
-        , addMove
+        , moves
+        , nextMove
+        , position
+        , previousMove
+        , toBeginning
+        , toEnd
+        , toPgn
         )
 
-{-|
-The `Game` type and related functions.
+{-| The `Game` type and related functions.
 
 At the moment, a game is little more than a sequence of moves, and a current
 position. There is no support for annotation in the form of comments or
 variations. Support for tree-like games with recursive variations and
 comments are planned for a future version of this library.
 
+
 # Types
+
 @docs Game
 
+
 # Constants
+
 @docs empty
 
+
 # Converting Games to and from PGN
+
 @docs fromPgn, toPgn
 
+
 # Getting the Current Position
+
 @docs position
 
+
 # Getting Game Moves
+
 @docs moves, previousMove, nextMove
 
+
 # Navigating in the Game.
+
 @docs goToMove, forward, back, toBeginning, toEnd, isAtBeginning, isAtEnd
 
+
 # Adding New Moves
+
 @docs addMove
+
 -}
 
 import Internal.Game as Internal

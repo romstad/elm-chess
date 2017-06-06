@@ -1,11 +1,13 @@
 module Notation exposing (..)
 
-{-|
-Functions for converting moves and variations to and from textual
+{-| Functions for converting moves and variations to and from textual
 representations.
 
+
 # Functions
+
 @docs fromSan, toSan, variationToSan, fromUci, toUci
+
 -}
 
 import Internal.Notation as Internal

@@ -1,24 +1,24 @@
 module Internal.Game
     exposing
         ( Game
-        , TagPair
         , GameResult(..)
-        , empty
-        , moves
-        , previousMove
-        , nextMove
-        , tagValue
-        , position
-        , goToMove
-        , forward
-        , back
-        , toBeginning
-        , toEnd
-        , isAtBeginning
-        , isAtEnd
+        , TagPair
         , addMove
         , addSanMove
         , addSanMoveSequence
+        , back
+        , empty
+        , forward
+        , goToMove
+        , isAtBeginning
+        , isAtEnd
+        , moves
+        , nextMove
+        , position
+        , previousMove
+        , tagValue
+        , toBeginning
+        , toEnd
         )
 
 import Array exposing (Array)
@@ -89,22 +89,22 @@ moves : Game -> List Move
 moves game =
     let
         movesInternal result pos =
-            case (Position.lastMove pos) of
+            case Position.lastMove pos of
                 Nothing ->
                     result
 
                 Just m ->
-                    case (Position.parent pos) of
+                    case Position.parent pos of
                         Nothing ->
                             result
 
                         Just p ->
                             movesInternal (m :: result) p
     in
-        game
-            |> toEnd
-            |> position
-            |> movesInternal []
+    game
+        |> toEnd
+        |> position
+        |> movesInternal []
 
 
 {-| The previous move in the game, i.e. the move that resulted in the
@@ -184,7 +184,7 @@ isAtBeginning game =
 -}
 isAtEnd : Game -> Bool
 isAtEnd game =
-    game.currentMoveIndex == (Array.length game.positions) - 1
+    game.currentMoveIndex == Array.length game.positions - 1
 
 
 {-| Add a move to the game at the current move index. Any previous game
@@ -196,13 +196,13 @@ addMove move game =
         pos =
             Position.doMove move (position game)
     in
-        { game
-            | positions =
-                Array.slice 0 (1 + game.currentMoveIndex) game.positions
-                    |> Array.push pos
-            , currentMoveIndex = game.currentMoveIndex + 1
-            , currentPosition = pos
-        }
+    { game
+        | positions =
+            Array.slice 0 (1 + game.currentMoveIndex) game.positions
+                |> Array.push pos
+        , currentMoveIndex = game.currentMoveIndex + 1
+        , currentPosition = pos
+    }
 
 
 {-| Tries to add a move in short algebraic notation at the current move index.

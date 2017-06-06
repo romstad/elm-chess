@@ -1,7 +1,7 @@
 module Internal.Square exposing (..)
 
 import Internal.BoardDimensions exposing (..)
-import Internal.PieceColor as PieceColor exposing (PieceColor, white, black)
+import Internal.PieceColor as PieceColor exposing (PieceColor, black, white)
 import Internal.SquareDelta as SquareDelta exposing (SquareDelta(SquareDelta))
 import Internal.SquareFile as File exposing (SquareFile(SquareFile))
 import Internal.SquareRank as Rank exposing (SquareRank(SquareRank))
@@ -100,12 +100,12 @@ fromString string =
         r =
             Rank.fromString (String.dropLeft 1 string)
     in
-        case f of
-            Just f ->
-                Maybe.map (make f) r
+    case f of
+        Just f ->
+            Maybe.map (make f) r
 
-            Nothing ->
-                Nothing
+        Nothing ->
+            Nothing
 
 
 
@@ -121,7 +121,7 @@ compress square =
         r =
             unwrap square // extendedFileCount
     in
-        (f - fileMin) + fileCount * (r - rankMin)
+    (f - fileMin) + fileCount * (r - rankMin)
 
 
 expand : Int -> Square
@@ -133,7 +133,7 @@ expand i =
         r =
             i // fileCount
     in
-        Square (f + fileMin + (r + rankMin) * extendedFileCount)
+    Square (f + fileMin + (r + rankMin) * extendedFileCount)
 
 
 
@@ -187,8 +187,8 @@ squaresInDirection startSquare delta =
                     (add square delta)
                     (square :: acc)
     in
-        List.reverse <|
-            squaresInDirectionInternal (add startSquare delta) []
+    List.reverse <|
+        squaresInDirectionInternal (add startSquare delta) []
 
 
 
@@ -219,10 +219,10 @@ possibleDeltasInDirection delta =
                 deltas =
                     deltasInDirection sq delta
             in
-                if (List.length deltas) > (List.length result) then
-                    deltas
-                else
-                    result
+            if List.length deltas > List.length result then
+                deltas
+            else
+                result
         )
         []
         all

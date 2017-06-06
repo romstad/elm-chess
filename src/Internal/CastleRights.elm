@@ -19,7 +19,7 @@ module Internal.CastleRights
 
 import Bitwise exposing (..)
 import Internal.Move as Move exposing (Move)
-import Internal.PieceColor as PieceColor exposing (PieceColor, white, black)
+import Internal.PieceColor as PieceColor exposing (PieceColor, black, white)
 import Internal.Square as Square
 
 
@@ -82,37 +82,37 @@ doMove move rights =
         to =
             Move.to move
     in
-        rights
-            |> (if from == Square.a1 || to == Square.a1 then
-                    disableQueensideCastling white
-                else
-                    identity
-               )
-            |> (if from == Square.a8 || to == Square.a8 then
-                    disableQueensideCastling black
-                else
-                    identity
-               )
-            |> (if from == Square.h1 || to == Square.h1 then
-                    disableKingsideCastling white
-                else
-                    identity
-               )
-            |> (if from == Square.h8 || to == Square.h8 then
-                    disableKingsideCastling black
-                else
-                    identity
-               )
-            |> (if from == Square.e1 then
-                    disableAllCastling white
-                else
-                    identity
-               )
-            |> (if from == Square.e8 then
-                    disableAllCastling black
-                else
-                    identity
-               )
+    rights
+        |> (if from == Square.a1 || to == Square.a1 then
+                disableQueensideCastling white
+            else
+                identity
+           )
+        |> (if from == Square.a8 || to == Square.a8 then
+                disableQueensideCastling black
+            else
+                identity
+           )
+        |> (if from == Square.h1 || to == Square.h1 then
+                disableKingsideCastling white
+            else
+                identity
+           )
+        |> (if from == Square.h8 || to == Square.h8 then
+                disableKingsideCastling black
+            else
+                identity
+           )
+        |> (if from == Square.e1 then
+                disableAllCastling white
+            else
+                identity
+           )
+        |> (if from == Square.e8 then
+                disableAllCastling black
+            else
+                identity
+           )
 
 
 
@@ -172,22 +172,22 @@ toString rights =
         r =
             unwrap rights
     in
-        if r == 0 then
-            "-"
-        else
-            List.foldr
-                (++)
-                ""
-                (List.map2
-                    (\i s ->
-                        if and (shiftLeftBy i 1) r /= 0 then
-                            s
-                        else
-                            ""
-                    )
-                    (List.range 0 3)
-                    [ "K", "Q", "k", "q" ]
+    if r == 0 then
+        "-"
+    else
+        List.foldr
+            (++)
+            ""
+            (List.map2
+                (\i s ->
+                    if and (shiftLeftBy i 1) r /= 0 then
+                        s
+                    else
+                        ""
                 )
+                (List.range 0 3)
+                [ "K", "Q", "k", "q" ]
+            )
 
 
 fromChar : Char -> Int

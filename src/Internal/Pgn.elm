@@ -4,7 +4,7 @@ import Char
 import Internal.Game as Game exposing (Game, GameResult(..), TagPair)
 import Internal.Move as Move exposing (Move)
 import Internal.Notation as Notation
-import Parser exposing (Parser, (|.), (|=))
+import Parser exposing ((|.), (|=), Parser)
 import Set
 
 
@@ -45,21 +45,22 @@ gameToString game =
 gameFromPgnGame : PgnGame -> Maybe Game
 gameFromPgnGame g =
     Game.empty
-        |> \game ->
-            { game | tags = g.headers, result = result g }
-                |> Game.addSanMoveSequence
-                    (List.filterMap
-                        (\x ->
-                            case x of
-                                Move m ->
-                                    Just m
+        |> (\game ->
+                { game | tags = g.headers, result = result g }
+                    |> Game.addSanMoveSequence
+                        (List.filterMap
+                            (\x ->
+                                case x of
+                                    Move m ->
+                                        Just m
 
-                                _ ->
-                                    Nothing
+                                    _ ->
+                                        Nothing
+                            )
+                            g.moveText
                         )
-                        g.moveText
-                    )
-                |> Maybe.map Game.toBeginning
+                    |> Maybe.map Game.toBeginning
+           )
 
 
 tagValue : String -> PgnGame -> Maybe String
@@ -233,7 +234,7 @@ whitespaceOrPeriod =
 headersToString : Game -> String
 headersToString game =
     List.foldl
-        (\t result -> result ++ (headerToString t))
+        (\t result -> result ++ headerToString t)
         ""
         game.tags
 
