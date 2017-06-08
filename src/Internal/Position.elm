@@ -40,8 +40,8 @@ import Internal.SquareDelta as Delta exposing (SquareDelta)
 type alias PosRec =
     { board : Board -- The current board position
     , sideToMove : PieceColor -- The current side to move
-    , whiteKingSquare : Square -- Square of white's king
-    , blackKingSquare : Square -- Square of black's king
+    , whiteKingSquare : Maybe Square -- Square of white's king
+    , blackKingSquare : Maybe Square -- Square of black's king
     , castleRights : CastleRights -- Current castle rights info
     , epSquare : Maybe Square -- En passant square, if available
     , rule50Counter : Int -- Moves since last capture or pawn push
@@ -80,8 +80,8 @@ empty =
     Position
         { board = Board.empty
         , sideToMove = white
-        , whiteKingSquare = Square.e1
-        , blackKingSquare = Square.e8
+        , whiteKingSquare = Nothing
+        , blackKingSquare = Nothing
         , castleRights = CastleRights.empty
         , epSquare = Nothing
         , rule50Counter = 0
@@ -163,7 +163,7 @@ moveNumber position =
 
 {-| The square of the king for the given side.
 -}
-kingSquare : PieceColor -> Position -> Square
+kingSquare : PieceColor -> Position -> Maybe Square
 kingSquare color position =
     if color == white then
         (unwrap position).whiteKingSquare
@@ -198,13 +198,13 @@ putPiece piece square position =
         Position
             { pos
                 | board = Board.putPiece piece square pos.board
-                , whiteKingSquare = square
+                , whiteKingSquare = Just square
             }
     else if piece == Piece.blackKing then
         Position
             { pos
                 | board = Board.putPiece piece square pos.board
-                , blackKingSquare = square
+                , blackKingSquare = Just square
             }
     else
         Position
@@ -240,13 +240,13 @@ movePiece from to position =
         Position
             { pos
                 | board = Board.movePiece from to pos.board
-                , whiteKingSquare = to
+                , whiteKingSquare = Just to
             }
     else if piece == Piece.blackKing then
         Position
             { pos
                 | board = Board.movePiece from to pos.board
-                , blackKingSquare = to
+                , blackKingSquare = Just to
             }
     else
         Position
@@ -289,10 +289,15 @@ sideAttacksSquare side square position =
 -}
 isInCheck : PieceColor -> Position -> Bool
 isInCheck side position =
-    sideAttacksSquare
-        (PieceColor.opposite side)
-        (kingSquare side position)
-        position
+    case kingSquare side position of
+        Nothing ->
+            False
+
+        Just kingSquare ->
+            sideAttacksSquare
+                (PieceColor.opposite side)
+                kingSquare
+                position
 
 
 {-| Checks whether the side to move is in check.
@@ -335,24 +340,29 @@ pinDirection square position =
         kingSq =
             kingSquare color position
     in
-    case Piece.attackDelta Piece.whiteQueen square kingSq of
+    case kingSquare color position of
         Nothing ->
             Nothing
 
-        Just delta ->
-            if not (lineIsClear position square kingSq delta) then
-                Nothing
-            else
-                let
-                    s =
-                        scan position square (Delta.negate delta)
-                in
-                case Piece.attackDelta (pieceOn s position) s kingSq of
-                    Nothing ->
-                        Nothing
+        Just kingSq ->
+            case Piece.attackDelta Piece.whiteQueen square kingSq of
+                Nothing ->
+                    Nothing
 
-                    Just _ ->
-                        Just delta
+                Just delta ->
+                    if not (lineIsClear position square kingSq delta) then
+                        Nothing
+                    else
+                        let
+                            s =
+                                scan position square (Delta.negate delta)
+                        in
+                        case Piece.attackDelta (pieceOn s position) s kingSq of
+                            Nothing ->
+                                Nothing
+
+                            Just _ ->
+                                Just delta
 
 
 {-| Do a move on the board, returning the resulting position.
@@ -376,12 +386,12 @@ doMove move position =
                 , sideToMove = PieceColor.opposite pos.sideToMove
                 , whiteKingSquare =
                     if piece == whiteKing then
-                        to
+                        Just to
                     else
                         pos.whiteKingSquare
                 , blackKingSquare =
                     if piece == blackKing then
-                        to
+                        Just to
                     else
                         pos.blackKingSquare
                 , castleRights = CastleRights.doMove move pos.castleRights
@@ -540,30 +550,20 @@ fromFen fen =
                 Square.all
                 |> List.head
     in
-    case whiteKingSquare of
-        Nothing ->
-            Nothing
-
-        Just wksq ->
-            case blackKingSquare of
-                Nothing ->
-                    Nothing
-
-                Just bksq ->
-                    Just
-                        (Position
-                            { board = board
-                            , sideToMove = Maybe.withDefault white sideToMove
-                            , whiteKingSquare = wksq
-                            , blackKingSquare = bksq
-                            , castleRights = castleRights
-                            , epSquare = epSquare
-                            , rule50Counter = 0
-                            , gamePly = 0
-                            , lastMove = Nothing
-                            , parent = Nothing
-                            }
-                        )
+    Just
+        (Position
+            { board = board
+            , sideToMove = Maybe.withDefault white sideToMove
+            , whiteKingSquare = whiteKingSquare
+            , blackKingSquare = blackKingSquare
+            , castleRights = castleRights
+            , epSquare = epSquare
+            , rule50Counter = 0
+            , gamePly = 0
+            , lastMove = Nothing
+            , parent = Nothing
+            }
+        )
 
 
 {-| Convert a position to a FEN string
