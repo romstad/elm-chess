@@ -1,10 +1,10 @@
-module Internal.Square exposing (..)
+module Internal.Square exposing (Square(..), a1, a2, a3, a4, a5, a6, a7, a8, add, all, b1, b2, b3, b4, b5, b6, b7, b8, c1, c2, c3, c4, c5, c6, c7, c8, compress, d1, d2, d3, d4, d5, d6, d7, d8, delta, deltasInDirection, distance, e1, e2, e3, e4, e5, e6, e7, e8, expand, f1, f2, f3, f4, f5, f6, f7, f8, file, fileDistance, fromString, g1, g2, g3, g4, g5, g6, g7, g8, h1, h2, h3, h4, h5, h6, h7, h8, isOutside, isRankTwo, make, possibleDeltasInDirection, rank, rankDistance, squaresInDirection, subtract, toString, unwrap)
 
 import Internal.BoardDimensions exposing (..)
 import Internal.PieceColor as PieceColor exposing (PieceColor, black, white)
-import Internal.SquareDelta as SquareDelta exposing (SquareDelta(SquareDelta))
-import Internal.SquareFile as File exposing (SquareFile(SquareFile))
-import Internal.SquareRank as Rank exposing (SquareRank(SquareRank))
+import Internal.SquareDelta as SquareDelta exposing (SquareDelta(..))
+import Internal.SquareFile as File exposing (SquareFile(..))
+import Internal.SquareRank as Rank exposing (SquareRank(..))
 
 
 {- Files, ranks and squares are all simple wrappers around Ints.
@@ -42,8 +42,8 @@ type Square
 unwrap : Square -> Int
 unwrap square =
     case square of
-        Square square ->
-            square
+        Square square_ ->
+            square_
 
 
 
@@ -64,8 +64,8 @@ isOutside square =
 
 
 make : SquareFile -> SquareRank -> Square
-make file rank =
-    Square (File.unwrap file + Rank.unwrap rank * extendedFileCount)
+make file_ rank_ =
+    Square (File.unwrap file_ + Rank.unwrap rank_ * extendedFileCount)
 
 
 
@@ -74,7 +74,7 @@ make file rank =
 
 file : Square -> SquareFile
 file square =
-    SquareFile (unwrap square % extendedFileCount)
+    SquareFile (modBy extendedFileCount (unwrap square))
 
 
 rank : Square -> SquareRank
@@ -100,12 +100,12 @@ fromString string =
         r =
             Rank.fromString (String.dropLeft 1 string)
     in
-    case f of
-        Just f ->
-            Maybe.map (make f) r
+        case f of
+            Just f_ ->
+                Maybe.map (make f_) r
 
-        Nothing ->
-            Nothing
+            Nothing ->
+                Nothing
 
 
 
@@ -116,24 +116,24 @@ compress : Square -> Int
 compress square =
     let
         f =
-            unwrap square % extendedFileCount
+            modBy extendedFileCount (unwrap square)
 
         r =
             unwrap square // extendedFileCount
     in
-    (f - fileMin) + fileCount * (r - rankMin)
+        (f - fileMin) + fileCount * (r - rankMin)
 
 
 expand : Int -> Square
 expand i =
     let
         f =
-            i % fileCount
+            modBy fileCount i
 
         r =
             i // fileCount
     in
-    Square (f + fileMin + (r + rankMin) * extendedFileCount)
+        Square (f + fileMin + (r + rankMin) * extendedFileCount)
 
 
 
@@ -160,8 +160,8 @@ delta square0 square1 =
 
 
 add : Square -> SquareDelta -> Square
-add square delta =
-    Square (unwrap square + SquareDelta.unwrap delta)
+add square delta_ =
+    Square (unwrap square + SquareDelta.unwrap delta_)
 
 
 subtract : Square -> Square -> SquareDelta
@@ -177,18 +177,18 @@ subtract square0 square1 =
 
 
 squaresInDirection : Square -> SquareDelta -> List Square
-squaresInDirection startSquare delta =
+squaresInDirection startSquare delta_ =
     let
         squaresInDirectionInternal square acc =
             if isOutside square then
                 acc
             else
                 squaresInDirectionInternal
-                    (add square delta)
+                    (add square delta_)
                     (square :: acc)
     in
-    List.reverse <|
-        squaresInDirectionInternal (add startSquare delta) []
+        List.reverse <|
+            squaresInDirectionInternal (add startSquare delta_) []
 
 
 
@@ -199,10 +199,10 @@ squaresInDirection startSquare delta =
 
 
 deltasInDirection : Square -> SquareDelta -> List SquareDelta
-deltasInDirection startSquare delta =
+deltasInDirection startSquare delta_ =
     List.map
         (\s -> subtract s startSquare)
-        (squaresInDirection startSquare delta)
+        (squaresInDirection startSquare delta_)
 
 
 
@@ -212,17 +212,17 @@ deltasInDirection startSquare delta =
 
 
 possibleDeltasInDirection : SquareDelta -> List SquareDelta
-possibleDeltasInDirection delta =
+possibleDeltasInDirection delta_ =
     List.foldl
         (\sq result ->
             let
                 deltas =
-                    deltasInDirection sq delta
+                    deltasInDirection sq delta_
             in
-            if List.length deltas > List.length result then
-                deltas
-            else
-                result
+                if List.length deltas > List.length result then
+                    deltas
+                else
+                    result
         )
         []
         all

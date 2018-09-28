@@ -1,31 +1,31 @@
-module Internal.Game
-    exposing
-        ( Game
-        , GameResult(..)
-        , TagPair
-        , addMove
-        , addSanMove
-        , addSanMoveSequence
-        , back
-        , empty
-        , forward
-        , goToMove
-        , isAtBeginning
-        , isAtEnd
-        , moves
-        , nextMove
-        , position
-        , previousMove
-        , tagValue
-        , toBeginning
-        , toEnd
-        )
+module Internal.Game exposing
+    ( Game
+    , GameResult(..)
+    , TagPair
+    , addMove
+    , addSanMove
+    , addSanMoveSequence
+    , back
+    , empty
+    , forward
+    , goToMove
+    , isAtBeginning
+    , isAtEnd
+    , moves
+    , nextMove
+    , position
+    , previousMove
+    , tagValue
+    , toBeginning
+    , toEnd
+    )
 
 import Array exposing (Array)
 import Internal.Move as Move exposing (Move)
 import Internal.Notation exposing (fromSan)
 import Internal.Position as Position exposing (Position)
 import Internal.Util exposing (failableFoldl)
+
 
 
 {- Later on, games should probably be some kind of tree like data type, like in
@@ -123,6 +123,7 @@ nextMove : Game -> Maybe Move
 nextMove game =
     if isAtEnd game then
         Nothing
+
     else
         game |> forward |> previousMove
 
@@ -133,6 +134,7 @@ goToMove : Int -> Game -> Game
 goToMove moveIndex game =
     if moveIndex < 0 || moveIndex >= Array.length game.positions then
         game
+
     else
         { game
             | currentMoveIndex = moveIndex

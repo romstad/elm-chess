@@ -1,0 +1,27 @@
+INFO: Found elm at /Users/emartin2/.nvm/versions/node/v6.11.5/bin/elm
+INFO: Found elm 0.19.0
+INFO: Found elm-format at /Users/emartin2/.nvm/versions/node/v6.11.5/bin/elm-format
+INFO: Found elm-format 0.8.0
+INFO: Cleaning ./elm-stuff before upgrading
+INFO: Converting elm-package.json -> elm.json
+INFO: Detected a package project (this project has exposed modules)
+INFO: Detected 'BSD3' license, which is not a valid SPDX license identifier; converting to 'BSD-3-Clause'
+INFO: Switching from elm-lang/core (deprecated) to elm/core
+INFO: Installing latest version of elm/core
+INFO: Switching from elm-tools/parser (deprecated) to elm/parser
+INFO: Installing latest version of elm/parser
+INFO: Upgrading *.elm files in src/
+
+
+SUCCESS! Your project's dependencies and code have been upgraded.
+However, your project may not yet compile due to API changes in your
+dependencies.
+
+See <https://github.com/elm/compiler/blob/master/upgrade-docs/0.19.md>
+and the documentation for your dependencies for more information.
+
+Here are some common upgrade steps that you will need to do manually:
+
+- elm/core
+  - [ ] Replace uses of toString with String.fromInt, String.fromFloat, or Debug.toString as appropriate
+

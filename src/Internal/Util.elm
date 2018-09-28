@@ -1,4 +1,4 @@
-module Internal.Util exposing (..)
+module Internal.Util exposing (failableFoldl)
 
 {-| Like List.foldl, but returns a Maybe value, and exits early when some
 application of `f` along the way returns `Nothing`. Here's a function that

@@ -1,11 +1,9 @@
 {
-    "version": "1.1.1",
+    "type": "package",
+    "name": "romstad/elm-chess",
     "summary": "Elm library for computer chess",
-    "repository": "https://github.com/romstad/elm-chess.git",
-    "license": "BSD3",
-    "source-directories": [
-        "src"
-    ],
+    "license": "BSD-3-Clause",
+    "version": "1.1.1",
     "exposed-modules": [
         "Game",
         "Move",
@@ -18,9 +16,10 @@
         "SquareFile",
         "SquareRank"
     ],
+    "elm-version": "0.19.0 <= v < 0.20.0",
     "dependencies": {
-        "elm-lang/core": "5.1.1 <= v < 6.0.0",
-        "elm-tools/parser": "2.0.1 <= v < 3.0.0"
+        "elm/core": "1.0.0 <= v < 2.0.0",
+        "elm/parser": "1.1.0 <= v < 2.0.0"
     },
-    "elm-version": "0.18.0 <= v < 0.19.0"
+    "test-dependencies": {}
 }

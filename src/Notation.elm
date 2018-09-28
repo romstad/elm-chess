@@ -1,4 +1,4 @@
-module Notation exposing (..)
+module Notation exposing (fromSan, toSan, variationToSan, fromUci, toUci)
 
 {-| Functions for converting moves and variations to and from textual
 representations.

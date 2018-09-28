@@ -1,4 +1,9 @@
-module Piece exposing (..)
+module Piece exposing
+    ( Piece
+    , make, color, kind
+    , all, whitePawn, whiteKnight, whiteBishop, whiteRook, whiteQueen, whiteKing, blackPawn, blackKnight, blackBishop, blackRook, blackQueen, blackKing
+    , fromChar, fromString, toChar, toString
+    )
 
 {-|
 
@@ -39,6 +44,7 @@ type alias Piece =
 {-| Create a piece with the given color and type.
 
     make PieceColor.white PieceType.queen == whiteQueen
+
     make PieceColor.black PieceType.knight == blackKnight
 
 -}
@@ -50,6 +56,7 @@ make =
 {-| Get the color of a piece.
 
     color whiteBishop == PieceColor.white
+
     color blackQueen == PieceColor.black
 
 -}
@@ -62,6 +69,7 @@ color =
 have to use an awkward name.
 
     kind whiteBishop == PieceType.bishop
+
     kind blackQueen == PieceType.queen
 
 -}
@@ -74,6 +82,7 @@ kind =
 White pieces become uppercase letters, black pieces become lowercase letters.
 
     toChar whiteRook == 'R'
+
     toChar blackQueen == 'q'
 
 -}
@@ -87,6 +96,7 @@ corresponding character in Forsyth-Edwards notation. White pieces become
 uppercase letters, black pieces become lowercase letters.
 
     toString whiteRook == "R"
+
     toString blackQueen == "q"
 
 -}
@@ -100,7 +110,9 @@ Uppercase letters become white pieces, lowercase letters become black pieces.
 If the character is not a valid piece letter, returns `Nothing`.
 
     fromChar 'R' == Just whiteRook
+
     fromChar 'q' == Just blackQueen
+
     fromChar 'x' == Nothing
 
 -}
@@ -115,8 +127,11 @@ letters become black pieces. If the character is not a valid piece letter, or
 if the string is empty, returns `Nothing`.
 
     fromString "R" == Just whiteRook
+
     fromString "Kbb" == Just whiteKing
+
     fromString "q" == Just blackQueen
+
     fromString "x" == Nothing
 
 -}

@@ -20,9 +20,9 @@ import Array exposing (Array)
 import Char
 import Internal.BoardDimensions exposing (..)
 import Internal.Move as Move exposing (Move)
-import Internal.Piece as Piece exposing (Piece(Piece))
+import Internal.Piece as Piece exposing (Piece(..))
 import Internal.PieceColor as PieceColor exposing (PieceColor)
-import Internal.Square as Square exposing (Square(Square))
+import Internal.Square as Square exposing (Square(..))
 import Internal.SquareDelta as Delta exposing (SquareDelta)
 
 
@@ -84,38 +84,38 @@ doMove move board =
         to =
             Move.to move
     in
-    case Move.promotion move of
-        Nothing ->
-            if Move.isKingsideCastle move then
-                board
-                    |> movePiece from to
-                    |> movePiece
-                        (Square.add to Delta.e)
-                        (Square.add from Delta.e)
-            else if Move.isQueensideCastle move then
-                board
-                    |> movePiece from to
-                    |> movePiece
-                        (Square.add to (Delta.multiply 2 Delta.w))
-                        (Square.add from Delta.w)
-            else if Move.isEp move then
-                let
-                    fromRank =
-                        Square.rank from
+        case Move.promotion move of
+            Nothing ->
+                if Move.isKingsideCastle move then
+                    board
+                        |> movePiece from to
+                        |> movePiece
+                            (Square.add to Delta.e)
+                            (Square.add from Delta.e)
+                else if Move.isQueensideCastle move then
+                    board
+                        |> movePiece from to
+                        |> movePiece
+                            (Square.add to (Delta.multiply 2 Delta.w))
+                            (Square.add from Delta.w)
+                else if Move.isEp move then
+                    let
+                        fromRank =
+                            Square.rank from
 
-                    toFile =
-                        Square.file to
-                in
-                board
-                    |> movePiece from to
-                    |> removePiece (Square.make toFile fromRank)
-            else
-                movePiece from to board
+                        toFile =
+                            Square.file to
+                    in
+                        board
+                            |> movePiece from to
+                            |> removePiece (Square.make toFile fromRank)
+                else
+                    movePiece from to board
 
-        Just kind ->
-            board
-                |> removePiece from
-                |> putPiece (Piece.make us kind) to
+            Just kind ->
+                board
+                    |> removePiece from
+                    |> putPiece (Piece.make us kind) to
 
 
 
@@ -153,9 +153,9 @@ movePiece from to board =
         piece =
             pieceOn from board
     in
-    board
-        |> removePiece from
-        |> putPiece piece to
+        board
+            |> removePiece from
+            |> putPiece piece to
 
 
 
@@ -203,7 +203,7 @@ scan board square delta =
             else
                 scanInternal (Square.add s delta)
     in
-    scanInternal (Square.add square delta)
+        scanInternal (Square.add square delta)
 
 
 
@@ -221,7 +221,7 @@ lineIsClear board square0 square1 delta =
                         && lineIsClearInternal (Square.add s0 delta) s1
                    )
     in
-    lineIsClearInternal (Square.add square0 delta) square1
+        lineIsClearInternal (Square.add square0 delta) square1
 
 
 
@@ -234,15 +234,15 @@ pieceAttacksSquare from to board =
         piece =
             pieceOn from board
     in
-    case Piece.attackDelta piece from to of
-        Nothing ->
-            False
+        case Piece.attackDelta piece from to of
+            Nothing ->
+                False
 
-        Just delta ->
-            if Piece.isSlider piece then
-                lineIsClear board from to delta
-            else
-                True
+            Just delta ->
+                if Piece.isSlider piece then
+                    lineIsClear board from to delta
+                else
+                    True
 
 
 
@@ -327,7 +327,7 @@ writeFenPiece piece state =
     else if state.skip > 0 then
         { string =
             state.string
-                ++ Basics.toString state.skip
+                ++ String.fromInt state.skip
                 ++ Piece.toString piece
         , skip = 0
         }
@@ -340,7 +340,7 @@ writeFenPiece piece state =
 fenNextRank : WriteFenState -> WriteFenState
 fenNextRank state =
     if state.skip > 0 then
-        { string = state.string ++ Basics.toString state.skip ++ "/"
+        { string = state.string ++ String.fromInt state.skip ++ "/"
         , skip = 0
         }
     else
@@ -352,7 +352,7 @@ fenNextRank state =
 fenDone : WriteFenState -> WriteFenState
 fenDone state =
     if state.skip > 0 then
-        { string = state.string ++ Basics.toString state.skip
+        { string = state.string ++ String.fromInt state.skip
         , skip = 0
         }
     else

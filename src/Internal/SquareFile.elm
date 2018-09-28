@@ -1,4 +1,4 @@
-module Internal.SquareFile exposing (..)
+module Internal.SquareFile exposing (SquareFile(..), a, all, b, c, d, distance, e, f, fromChar, fromString, g, h, isOutside, toChar, toIndex, toString, unwrap)
 
 {- A `SquareFile` is a simple wrapper around an `Int`. -}
 
@@ -19,8 +19,8 @@ type SquareFile
 unwrap : SquareFile -> Int
 unwrap file =
     case file of
-        SquareFile file ->
-            file
+        SquareFile file_ ->
+            file_
 
 
 
@@ -49,13 +49,13 @@ toString =
 fromChar : Char -> Maybe SquareFile
 fromChar char =
     let
-        f =
+        f_ =
             Char.toCode char - Char.toCode 'a'
     in
-    if f >= 0 && f < fileCount then
-        Just (SquareFile (f + fileMin))
-    else
-        Nothing
+        if f_ >= 0 && f_ < fileCount then
+            Just (SquareFile (f_ + fileMin))
+        else
+            Nothing
 
 
 fromString : String -> Maybe SquareFile

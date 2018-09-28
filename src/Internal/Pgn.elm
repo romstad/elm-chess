@@ -1,4 +1,4 @@
-module Internal.Pgn exposing (..)
+module Internal.Pgn exposing (MoveText, MoveTextItem(..), PgnGame, comment, escapedChar, examplePgn, fromString, gameFromPgnGame, gameFromString, gameToString, headerToString, headers, headersToString, isSymbolContinuation, isSymbolStart, move, moveNumber, moveText, moveTextItem, moves, movesToString, nag, pgn, result, resultToString, string, symbol, tagPair, tagValue, termination, whitespace, whitespaceOrPeriod)
 
 import Char
 import Internal.Game as Game exposing (Game, GameResult(..), TagPair)
@@ -101,7 +101,7 @@ pgn =
 headers : Parser (List TagPair)
 headers =
     Parser.repeat Parser.zeroOrMore <|
-        Parser.delayedCommit whitespace tagPair
+        Parser.delayedCommit Parser.spaces tagPair
 
 
 moveText : Parser MoveText
@@ -114,10 +114,10 @@ moveText =
 
 tagPair : Parser TagPair
 tagPair =
-    Parser.succeed (,)
+    Parser.succeed (\a b -> ( a, b ))
         |. Parser.symbol "["
         |= symbol
-        |. whitespace
+        |. Parser.spaces
         |= string
         |. Parser.symbol "]"
 
@@ -219,22 +219,32 @@ isSymbolContinuation char =
             (Set.fromList [ '_', '+', '#', '=', ':', '-', '/' ])
 
 
-whitespace : Parser ()
 whitespace =
-    Parser.ignore Parser.zeroOrMore <|
-        \c -> c == ' ' || c == '\n'
+    Parser.spaces
 
 
-whitespaceOrPeriod : Parser ()
+
+--whitespace : Parser ()
+--whitespace =
+--    Parser.ignore Parser.zeroOrMore <|
+--        \c -> c == ' ' || c == '\n'
+
+
 whitespaceOrPeriod =
-    Parser.ignore Parser.zeroOrMore <|
-        \c -> c == ' ' || c == '\n' || c == '.'
+    Parser.chompIf (\c -> c == ' ' || c == '\n')
+
+
+
+--whitespaceOrPeriod : Parser ()
+--whitespaceOrPeriod =
+--    Parser.ignore Parser.zeroOrMore <|
+--        \c -> c == ' ' || c == '\n' || c == '.'
 
 
 headersToString : Game -> String
 headersToString game =
     List.foldl
-        (\t result -> result ++ headerToString t)
+        (\t result_ -> result_ ++ headerToString t)
         ""
         game.tags
 

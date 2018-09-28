@@ -1,4 +1,9 @@
-module SquareFile exposing (..)
+module SquareFile exposing
+    ( SquareFile
+    , fromChar, fromString, toChar, toString
+    , all, a, b, c, d, e, f, g, h
+    , distance, toIndex
+    )
 
 {-| The `SquareFile` data type and related functions and definitions.
 
@@ -37,6 +42,7 @@ type alias SquareFile =
 {-| Converts a `SquareFile` to a `Char` in the range a-h.
 
     toChar c == 'c'
+
     List.map toChar all == [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' ]
 
 -}
@@ -49,6 +55,7 @@ toChar =
 letter in the range a-h.
 
     toString c == "c"
+
     List.map toString all == [ "a", "b", "c", "d", "e", "f", "g", "h" ]
 
 -}
@@ -61,7 +68,8 @@ toString =
 character is not a lowercase letter in the range a-h.
 
     fromChar 'e' == Just e
-    List.map fromChar ['a', 'x', 'h'] == [ Just a, Nothing, Just h ]
+
+    List.map fromChar [ 'a', 'x', 'h' ] == [ Just a, Nothing, Just h ]
 
 -}
 fromChar : Char -> Maybe SquareFile
@@ -74,7 +82,8 @@ character of the string. Returns `Nothing` if the first character is not a
 lowercase letter in the range a-h.
 
     fromString "e" == Just e
-    List.map fromChar ["a", "x", "h"] == [ Just a, Nothing, Just h ]
+
+    List.map fromChar [ "a", "x", "h" ] == [ Just a, Nothing, Just h ]
 
 -}
 fromString : String -> Maybe SquareFile
@@ -148,6 +157,7 @@ h =
 {-| The horizontal distance between two files.
 
     distance a h == 7
+
     distance e c == 2
 
 -}

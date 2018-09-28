@@ -1,4 +1,22 @@
-module Internal.PieceType exposing (..)
+module Internal.PieceType
+    exposing
+        ( PieceType(..)
+        , none
+        , pawn
+        , knight
+        , bishop
+        , rook
+        , queen
+        , king
+        , all
+        , promotionPieces
+        , isSlider
+        , fromChar
+        , fromString
+        , toChar
+        , toString
+        , unwrap
+        )
 
 {-| This module defines the PieceType type and related functions. A
 PieceType value is basically an uncolored chess piece.
@@ -47,8 +65,8 @@ code.
 unwrap : PieceType -> Int
 unwrap kind =
     case kind of
-        PieceType kind ->
-            kind
+        PieceType kind_ ->
+            kind_
 
 
 {-| The special value "none" is the type of the "piece" that occupies
@@ -138,10 +156,15 @@ isSlider kind =
 algebraic notation.
 
     toChar pawn == 'P'
+
     toChar knight == 'N'
+
     toChar bishop == 'B'
+
     toChar rook == 'R'
+
     toChar queen == 'Q'
+
     toChar king == 'K'
 
 -}
@@ -167,10 +190,15 @@ toChar kind =
 corresponding piece letter used in English algebraic notation.
 
     toString pawn == "P"
+
     toString knight == "N"
+
     toString bishop == "B"
+
     toString rook == "R"
+
     toString queen == "Q"
+
     toString king == "K"
 
 -}
@@ -184,7 +212,9 @@ and lowercase letters; returns Nothing if the character is not one of the
 piece letters used in English algebraic notation.
 
     fromChar 'P' == Just pawn
+
     fromChar 'r' == Just rook
+
     fromChar 'x' == Nothing
 
 -}
@@ -194,20 +224,20 @@ fromChar char =
         ch =
             Char.toUpper char
     in
-    if ch == 'P' then
-        Just pawn
-    else if ch == 'N' then
-        Just knight
-    else if ch == 'B' then
-        Just bishop
-    else if ch == 'R' then
-        Just rook
-    else if ch == 'Q' then
-        Just queen
-    else if ch == 'K' then
-        Just king
-    else
-        Nothing
+        if ch == 'P' then
+            Just pawn
+        else if ch == 'N' then
+            Just knight
+        else if ch == 'B' then
+            Just bishop
+        else if ch == 'R' then
+            Just rook
+        else if ch == 'Q' then
+            Just queen
+        else if ch == 'K' then
+            Just king
+        else
+            Nothing
 
 
 {-| Tries to convert a string to a PieceType, based on the first character
@@ -216,7 +246,9 @@ Nothing if the character is not one of the piece letters used in English
 algebraic notation.
 
     fromString "k" == Just king
+
     fromString "Qa4+" == Just queen
+
     fromString "x" == Nothing
 
 -}

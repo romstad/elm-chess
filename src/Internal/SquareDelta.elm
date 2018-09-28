@@ -1,4 +1,4 @@
-module Internal.SquareDelta exposing (..)
+module Internal.SquareDelta exposing (SquareDelta(..), add, e, max, multiply, n, ne, nee, negate, nn, nne, nnw, nw, nww, pawnPush, s, se, see, ss, sse, ssw, subtract, sw, sww, unwrap, w, zero)
 
 import Internal.BoardDimensions exposing (..)
 import Internal.PieceColor exposing (..)
@@ -22,8 +22,8 @@ type SquareDelta
 unwrap : SquareDelta -> Int
 unwrap delta =
     case delta of
-        SquareDelta delta ->
-            delta
+        SquareDelta delta_ ->
+            delta_
 
 
 
