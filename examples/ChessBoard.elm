@@ -16,9 +16,7 @@ import SquareFile as File
 import SquareRank as Rank
 
 
---main : Program Never Model Msg
-
-
+main : Program () Model Msg
 main =
     Browser.element
         { init = init
