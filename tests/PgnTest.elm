@@ -4,7 +4,7 @@ import Test exposing (..)
 import ElmTestBDDStyle exposing (..)
 import Internal.Game exposing (Game, GameResult(..), TagPair)
 import Expect exposing (..)
-import Internal.Pgn2 exposing (..)
+import Internal.Pgn exposing (..)
 import Parser
 
 
