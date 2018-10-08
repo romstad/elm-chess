@@ -209,12 +209,6 @@ squareToCoordinates square_ isRotated =
     )
 
 
-
---styles : List Css.Mixin -> Html.Attribute msg
---styles =
---    Css.asPairs >> Html.Attributes.style
-
-
 pieceImgUrl : Piece -> String
 pieceImgUrl piece =
     imgUrlPrefix
