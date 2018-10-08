@@ -53,7 +53,7 @@ comments are planned for a future version of this library.
 -}
 
 import Internal.Game as Internal
-import Internal.Pgn as Pgn
+import Internal.Pgn exposing (gameFromString, gameToString)
 import Move exposing (Move)
 import Position exposing (Position)
 
@@ -76,7 +76,7 @@ parsing fails, or if there are illegal or ambiguous moves.
 -}
 fromPgn : String -> Maybe Game
 fromPgn pgnString =
-    Pgn.gameFromString pgnString
+    gameFromString pgnString
         |> Maybe.map Game
 
 
@@ -86,7 +86,7 @@ toPgn : Game -> String
 toPgn game =
     case game of
         Game game ->
-            Pgn.gameToString game
+            gameToString game
 
 
 {-| The current position in the game.

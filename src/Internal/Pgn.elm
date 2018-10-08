@@ -1,10 +1,10 @@
-module Internal.Pgn exposing (MoveText, MoveTextItem(..), PgnGame, comment, escapedChar, examplePgn, fromString, gameFromPgnGame, gameFromString, gameToString, headerToString, headers, headersToString, isSymbolContinuation, isSymbolStart, move, moveNumber, moveText, moveTextItem, moves, movesToString, nag, pgn, result, resultToString, string, symbol, tagPair, tagValue, termination, whitespace, whitespaceOrPeriod)
+module Internal.Pgn exposing (gameFromString, gameToString)
 
 import Char
 import Internal.Game as Game exposing (Game, GameResult(..), TagPair)
 import Internal.Move as Move exposing (Move)
 import Internal.Notation as Notation
-import Parser exposing ((|.), (|=), Parser)
+import Parser exposing (..)
 import Set
 
 
@@ -100,8 +100,43 @@ pgn =
 
 headers : Parser (List TagPair)
 headers =
-    Parser.repeat Parser.zeroOrMore <|
-        Parser.delayedCommit Parser.spaces tagPair
+    Parser.sequence
+        { start = ""
+        , separator = ""
+        , end = ""
+        , spaces = Parser.spaces
+        , item = tagPair
+        , trailing = Parser.Optional
+        }
+
+
+tagPair : Parser TagPair
+tagPair =
+    succeed (\a b -> ( a, b ))
+        |. symbol "["
+        |. spaces
+        |= tag1
+        |. spaces
+        |. symbol "\""
+        |= tag2
+        |. symbol "\""
+        |. spaces
+        |. symbol "]"
+        |. chompUntilEndOr "\n"
+
+
+tag1 : Parser String
+tag1 =
+    getChompedString <|
+        succeed ()
+            |. chompWhile (\c -> c /= ' ')
+
+
+tag2 : Parser String
+tag2 =
+    getChompedString <|
+        succeed ()
+            |. chompWhile (\c -> c /= '"')
 
 
 moveText : Parser MoveText
@@ -110,16 +145,6 @@ moveText =
         Parser.succeed identity
             |. whitespaceOrPeriod
             |= moveTextItem
-
-
-tagPair : Parser TagPair
-tagPair =
-    Parser.succeed (\a b -> ( a, b ))
-        |. Parser.symbol "["
-        |= symbol
-        |. Parser.spaces
-        |= string
-        |. Parser.symbol "]"
 
 
 moveTextItem : Parser MoveTextItem
@@ -140,9 +165,9 @@ moveTextItem =
 termination : Parser GameResult
 termination =
     Parser.oneOf
-        [ Parser.succeed WhiteWins |. Parser.symbol "1-0"
-        , Parser.succeed BlackWins |. Parser.symbol "0-1"
-        , Parser.succeed Draw |. Parser.symbol "1/2-1/2"
+        [ Parser.succeed WhiteWins |. Parser.keyword "1-0"
+        , Parser.succeed BlackWins |. Parser.keyword "0-1"
+        , Parser.succeed Draw |. Parser.keyword "1/2-1/2"
         , Parser.succeed UnknownResult |. Parser.symbol "*"
         ]
 
@@ -231,7 +256,7 @@ whitespace =
 
 
 whitespaceOrPeriod =
-    Parser.chompIf (\c -> c == ' ' || c == '\n')
+    Parser.chompIf (\c -> c == ' ' || c == '\n' || c == '.')
 
 
 
