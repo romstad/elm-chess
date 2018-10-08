@@ -1,12 +1,22 @@
-module Game exposing
-    ( Game
-    , empty
-    , fromPgn, toPgn
-    , position
-    , moves, previousMove, nextMove
-    , goToMove, forward, back, toBeginning, toEnd, isAtBeginning, isAtEnd
-    , addMove
-    )
+module Game
+    exposing
+        ( Game
+        , empty
+        , fromPgn
+        , toPgn
+        , position
+        , moves
+        , previousMove
+        , nextMove
+        , goToMove
+        , forward
+        , back
+        , toBeginning
+        , toEnd
+        , isAtBeginning
+        , isAtEnd
+        , addMove
+        )
 
 {-| The `Game` type and related functions.
 
@@ -85,8 +95,8 @@ fromPgn pgnString =
 toPgn : Game -> String
 toPgn game =
     case game of
-        Game game ->
-            gameToString game
+        Game g ->
+            gameToString g
 
 
 {-| The current position in the game.
