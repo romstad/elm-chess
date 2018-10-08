@@ -1,9 +1,9 @@
-module PgnViewer exposing (..)
+module PgnViewer exposing (Model, Msg(..), board, boardOrError, imgUrlPrefix, init, main, pgnInputBox, pieceImgUrl, square, squareToCoordinates, styles, update, view)
 
 import Css
 import Game exposing (Game)
 import Html exposing (..)
-import Html.Attributes exposing (class, placeholder, rows, cols)
+import Html.Attributes exposing (class, cols, placeholder, rows)
 import Html.Events exposing (onClick, onInput)
 import Piece exposing (Piece)
 import PieceColor
@@ -136,8 +136,9 @@ square ( col, row ) piece sqSize =
     Html.div
         [ styles
             [ Css.backgroundColor
-                (if (col + row) % 2 == 0 then
+                (if modBy 2 (col + row) == 0 then
                     Css.rgb 200 200 200
+
                  else
                     Css.rgb 140 140 140
                 )
