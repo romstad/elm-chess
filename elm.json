@@ -3,7 +3,7 @@
     "name": "romstad/elm-chess",
     "summary": "Elm library for computer chess",
     "license": "BSD-3-Clause",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "exposed-modules": [
         "Game",
         "Move",
