@@ -85,8 +85,10 @@ toChar : PieceColor -> Char
 toChar color =
     if color == white then
         'w'
+
     else if color == black then
         'b'
+
     else
         '-'
 
@@ -114,8 +116,10 @@ fromChar : Char -> Maybe PieceColor
 fromChar char =
     if char == 'w' then
         Just white
+
     else if char == 'b' then
         Just black
+
     else
         Nothing
 

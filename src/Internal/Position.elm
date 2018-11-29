@@ -167,6 +167,7 @@ kingSquare : PieceColor -> Position -> Maybe Square
 kingSquare color position =
     if color == white then
         (unwrap position).whiteKingSquare
+
     else
         (unwrap position).blackKingSquare
 
@@ -194,21 +195,23 @@ putPiece piece square position =
         pos =
             unwrap position
     in
-        if piece == Piece.whiteKing then
-            Position
-                { pos
-                    | board = Board.putPiece piece square pos.board
-                    , whiteKingSquare = Just square
-                }
-        else if piece == Piece.blackKing then
-            Position
-                { pos
-                    | board = Board.putPiece piece square pos.board
-                    , blackKingSquare = Just square
-                }
-        else
-            Position
-                { pos | board = Board.putPiece piece square pos.board }
+    if piece == Piece.whiteKing then
+        Position
+            { pos
+                | board = Board.putPiece piece square pos.board
+                , whiteKingSquare = Just square
+            }
+
+    else if piece == Piece.blackKing then
+        Position
+            { pos
+                | board = Board.putPiece piece square pos.board
+                , blackKingSquare = Just square
+            }
+
+    else
+        Position
+            { pos | board = Board.putPiece piece square pos.board }
 
 
 {-| Remove the piece on the given square of the board, and return the modified
@@ -220,7 +223,7 @@ removePiece square position =
         pos =
             unwrap position
     in
-        Position { pos | board = Board.removePiece square pos.board }
+    Position { pos | board = Board.removePiece square pos.board }
 
 
 {-| Move a piece from one square to another, returing the modified position.
@@ -236,21 +239,23 @@ movePiece from to position =
         piece =
             pieceOn from position
     in
-        if piece == Piece.whiteKing then
-            Position
-                { pos
-                    | board = Board.movePiece from to pos.board
-                    , whiteKingSquare = Just to
-                }
-        else if piece == Piece.blackKing then
-            Position
-                { pos
-                    | board = Board.movePiece from to pos.board
-                    , blackKingSquare = Just to
-                }
-        else
-            Position
-                { pos | board = Board.movePiece from to pos.board }
+    if piece == Piece.whiteKing then
+        Position
+            { pos
+                | board = Board.movePiece from to pos.board
+                , whiteKingSquare = Just to
+            }
+
+    else if piece == Piece.blackKing then
+        Position
+            { pos
+                | board = Board.movePiece from to pos.board
+                , blackKingSquare = Just to
+            }
+
+    else
+        Position
+            { pos | board = Board.movePiece from to pos.board }
 
 
 {-| Scan the board from a given start square along a given direction (a square
@@ -340,29 +345,30 @@ pinDirection square position =
         kingSq =
             kingSquare color position
     in
-        case kingSquare color position of
-            Nothing ->
-                Nothing
+    case kingSquare color position of
+        Nothing ->
+            Nothing
 
-            Just kingSq_ ->
-                case Piece.attackDelta Piece.whiteQueen square kingSq_ of
-                    Nothing ->
+        Just kingSq_ ->
+            case Piece.attackDelta Piece.whiteQueen square kingSq_ of
+                Nothing ->
+                    Nothing
+
+                Just delta ->
+                    if not (lineIsClear position square kingSq_ delta) then
                         Nothing
 
-                    Just delta ->
-                        if not (lineIsClear position square kingSq_ delta) then
-                            Nothing
-                        else
-                            let
-                                s =
-                                    scan position square (Delta.negate delta)
-                            in
-                                case Piece.attackDelta (pieceOn s position) s kingSq_ of
-                                    Nothing ->
-                                        Nothing
+                    else
+                        let
+                            s =
+                                scan position square (Delta.negate delta)
+                        in
+                        case Piece.attackDelta (pieceOn s position) s kingSq_ of
+                            Nothing ->
+                                Nothing
 
-                                    Just _ ->
-                                        Just delta
+                            Just _ ->
+                                Just delta
 
 
 {-| Do a move on the board, returning the resulting position.
@@ -379,47 +385,52 @@ doMove move position =
         piece =
             pieceOn from position
     in
-        case position of
-            Position pos ->
-                Position
-                    { board = Board.doMove move pos.board
-                    , sideToMove = PieceColor.opposite pos.sideToMove
-                    , whiteKingSquare =
-                        if piece == whiteKing then
-                            Just to
-                        else
-                            pos.whiteKingSquare
-                    , blackKingSquare =
-                        if piece == blackKing then
-                            Just to
-                        else
-                            pos.blackKingSquare
-                    , castleRights = CastleRights.doMove move pos.castleRights
-                    , epSquare =
-                        if
-                            (piece == whitePawn)
-                                && (Square.subtract to from == Delta.nn)
-                        then
-                            Just (Square.add from Delta.n)
-                        else if
-                            (piece == blackPawn)
-                                && (Square.subtract to from == Delta.ss)
-                        then
-                            Just (Square.add from Delta.s)
-                        else
-                            Nothing
-                    , rule50Counter =
-                        if
-                            (Piece.kind piece == pawn)
-                                || (pieceOn to position /= Piece.empty)
-                        then
-                            0
-                        else
-                            pos.rule50Counter + 1
-                    , gamePly = pos.gamePly + 1
-                    , lastMove = Just move
-                    , parent = Just position
-                    }
+    case position of
+        Position pos ->
+            Position
+                { board = Board.doMove move pos.board
+                , sideToMove = PieceColor.opposite pos.sideToMove
+                , whiteKingSquare =
+                    if piece == whiteKing then
+                        Just to
+
+                    else
+                        pos.whiteKingSquare
+                , blackKingSquare =
+                    if piece == blackKing then
+                        Just to
+
+                    else
+                        pos.blackKingSquare
+                , castleRights = CastleRights.doMove move pos.castleRights
+                , epSquare =
+                    if
+                        (piece == whitePawn)
+                            && (Square.subtract to from == Delta.nn)
+                    then
+                        Just (Square.add from Delta.n)
+
+                    else if
+                        (piece == blackPawn)
+                            && (Square.subtract to from == Delta.ss)
+                    then
+                        Just (Square.add from Delta.s)
+
+                    else
+                        Nothing
+                , rule50Counter =
+                    if
+                        (Piece.kind piece == pawn)
+                            || (pieceOn to position /= Piece.empty)
+                    then
+                        0
+
+                    else
+                        pos.rule50Counter + 1
+                , gamePly = pos.gamePly + 1
+                , lastMove = Just move
+                , parent = Just position
+                }
 
 
 {-| List of all legal moves.
@@ -459,22 +470,29 @@ pseudoMovesFrom square position =
         piece =
             pieceOn square position
     in
-        if Piece.color piece /= sideToMove position then
-            []
-        else if Piece.kind piece == pawn then
-            pawnPseudoMovesFrom square position
-        else if Piece.kind piece == knight then
-            knightPseudoMovesFrom square position
-        else if Piece.kind piece == bishop then
-            bishopPseudoMovesFrom square position
-        else if Piece.kind piece == rook then
-            rookPseudoMovesFrom square position
-        else if Piece.kind piece == queen then
-            queenPseudoMovesFrom square position
-        else if Piece.kind piece == king then
-            kingPseudoMovesFrom square position
-        else
-            []
+    if Piece.color piece /= sideToMove position then
+        []
+
+    else if Piece.kind piece == pawn then
+        pawnPseudoMovesFrom square position
+
+    else if Piece.kind piece == knight then
+        knightPseudoMovesFrom square position
+
+    else if Piece.kind piece == bishop then
+        bishopPseudoMovesFrom square position
+
+    else if Piece.kind piece == rook then
+        rookPseudoMovesFrom square position
+
+    else if Piece.kind piece == queen then
+        queenPseudoMovesFrom square position
+
+    else if Piece.kind piece == king then
+        kingPseudoMovesFrom square position
+
+    else
+        []
 
 
 {-| Pseudo-legal moves to the given square for the given piece type. Castling
@@ -492,19 +510,21 @@ pseudoMovesTo piece square position =
         them =
             PieceColor.opposite us
     in
-        if
-            not
-                (capturedPiece
-                    == Piece.empty
-                    || Piece.color capturedPiece
-                    == them
-                )
-        then
-            []
-        else if piece == pawn then
-            pawnPseudoMovesTo us square position
-        else
-            piecePseudoMovesTo us piece square position
+    if
+        not
+            (capturedPiece
+                == Piece.empty
+                || Piece.color capturedPiece
+                == them
+            )
+    then
+        []
+
+    else if piece == pawn then
+        pawnPseudoMovesTo us square position
+
+    else
+        piecePseudoMovesTo us piece square position
 
 
 {-| Test whether a pseudo-legal move is legal; i.e. that it does not leave the
@@ -550,20 +570,20 @@ fromFen fen =
                 Square.all
                 |> List.head
     in
-        Just
-            (Position
-                { board = board
-                , sideToMove = Maybe.withDefault white sideToMove_
-                , whiteKingSquare = whiteKingSquare
-                , blackKingSquare = blackKingSquare
-                , castleRights = castleRights
-                , epSquare = epSquare_
-                , rule50Counter = 0
-                , gamePly = 0
-                , lastMove = Nothing
-                , parent = Nothing
-                }
-            )
+    Just
+        (Position
+            { board = board
+            , sideToMove = Maybe.withDefault white sideToMove_
+            , whiteKingSquare = whiteKingSquare
+            , blackKingSquare = blackKingSquare
+            , castleRights = castleRights
+            , epSquare = epSquare_
+            , rule50Counter = 0
+            , gamePly = 0
+            , lastMove = Nothing
+            , parent = Nothing
+            }
+        )
 
 
 {-| Convert a position to a FEN string
@@ -574,23 +594,23 @@ toFen position =
         pos =
             unwrap position
     in
-        Board.toFen pos.board
-            ++ " "
-            ++ PieceColor.toString pos.sideToMove
-            ++ " "
-            ++ CastleRights.toString pos.castleRights
-            ++ " "
-            ++ (case pos.epSquare of
-                    Just s ->
-                        Square.toString s
+    Board.toFen pos.board
+        ++ " "
+        ++ PieceColor.toString pos.sideToMove
+        ++ " "
+        ++ CastleRights.toString pos.castleRights
+        ++ " "
+        ++ (case pos.epSquare of
+                Just s ->
+                    Square.toString s
 
-                    Nothing ->
-                        "-"
-               )
-            ++ " "
-            ++ String.fromInt pos.rule50Counter
-            ++ " "
-            ++ String.fromInt (pos.gamePly // 2 + 1)
+                Nothing ->
+                    "-"
+           )
+        ++ " "
+        ++ String.fromInt pos.rule50Counter
+        ++ " "
+        ++ String.fromInt (pos.gamePly // 2 + 1)
 
 
 {-| Convert a position to UCI notation, for sending it to an engine by a
@@ -603,6 +623,7 @@ toUci position =
         toUciHelper pos moves_ =
             if (unwrap pos).rule50Counter == 0 then
                 ( pos, moves_ )
+
             else
                 case parent pos of
                     Nothing ->
@@ -619,20 +640,21 @@ toUci position =
         ( root, moves__ ) =
             toUciHelper position []
     in
-        "position fen "
-            ++ toFen root
-            ++ (if List.length moves__ == 0 then
-                    ""
-                else
-                    " moves "
-                        ++ List.foldr
-                            (++)
-                            ""
-                            (List.intersperse
-                                " "
-                                (List.map Move.toUci moves__)
-                            )
-               )
+    "position fen "
+        ++ toFen root
+        ++ (if List.length moves__ == 0 then
+                ""
+
+            else
+                " moves "
+                    ++ List.foldr
+                        (++)
+                        ""
+                        (List.intersperse
+                            " "
+                            (List.map Move.toUci moves__)
+                        )
+           )
 
 
 
@@ -648,9 +670,9 @@ pawnPseudoMovesFrom square position =
         them =
             PieceColor.opposite us
     in
-        pawnPushes us them square position
-            ++ pawnCaptures us them square position
-            ++ pawnEpCaptures us them square position
+    pawnPushes us them square position
+        ++ pawnCaptures us them square position
+        ++ pawnEpCaptures us them square position
 
 
 pawnPushes : PieceColor -> PieceColor -> Square -> Position -> List Move
@@ -659,27 +681,32 @@ pawnPushes us them square position =
         push =
             if us == white then
                 Delta.n
+
             else
                 Delta.s
 
         doublePush =
             Delta.multiply 2 push
     in
-        if not (isEmpty (Square.add square push) position) then
-            []
-        else if Square.isRankTwo square them then
-            List.map
-                (Move.makePromotion square (Square.add square push))
-                [ queen, rook, bishop, knight ]
-        else if Square.isRankTwo square us then
-            [ Move.make square (Square.add square push) ]
-                ++ (if not (isEmpty (Square.add square doublePush) position) then
-                        []
-                    else
-                        [ Move.make square (Square.add square doublePush) ]
-                   )
-        else
-            [ Move.make square (Square.add square push) ]
+    if not (isEmpty (Square.add square push) position) then
+        []
+
+    else if Square.isRankTwo square them then
+        List.map
+            (Move.makePromotion square (Square.add square push))
+            [ queen, rook, bishop, knight ]
+
+    else if Square.isRankTwo square us then
+        [ Move.make square (Square.add square push) ]
+            ++ (if not (isEmpty (Square.add square doublePush) position) then
+                    []
+
+                else
+                    [ Move.make square (Square.add square doublePush) ]
+               )
+
+    else
+        [ Move.make square (Square.add square push) ]
 
 
 pawnCaptures : PieceColor -> PieceColor -> Square -> Position -> List Move
@@ -688,6 +715,7 @@ pawnCaptures us them square position =
         ds =
             if us == white then
                 [ Delta.nw, Delta.ne ]
+
             else
                 [ Delta.sw, Delta.se ]
 
@@ -696,16 +724,17 @@ pawnCaptures us them square position =
                 |> List.map (Square.add square)
                 |> List.filter (\s -> colorOn s position == them)
     in
-        if Square.isRankTwo square them then
-            List.concatMap
-                (\to ->
-                    List.map
-                        (Move.makePromotion square to)
-                        [ queen, rook, bishop, knight ]
-                )
-                toSqs
-        else
-            List.map (Move.make square) toSqs
+    if Square.isRankTwo square them then
+        List.concatMap
+            (\to ->
+                List.map
+                    (Move.makePromotion square to)
+                    [ queen, rook, bishop, knight ]
+            )
+            toSqs
+
+    else
+        List.map (Move.make square) toSqs
 
 
 pawnEpCaptures : PieceColor -> PieceColor -> Square -> Position -> List Move
@@ -719,12 +748,13 @@ pawnEpCaptures us them square position =
                 ds =
                     if us == white then
                         [ Delta.nw, Delta.ne ]
+
                     else
                         [ Delta.sw, Delta.se ]
             in
-                List.map (Square.add square) ds
-                    |> List.filter ((==) epSquare_)
-                    |> List.map (Move.makeEp square)
+            List.map (Square.add square) ds
+                |> List.filter ((==) epSquare_)
+                |> List.map (Move.makeEp square)
 
 
 knightPseudoMovesFrom : Square -> Position -> List Move
@@ -733,14 +763,14 @@ knightPseudoMovesFrom square position =
         them =
             sideToMove position |> PieceColor.opposite
     in
-        Piece.attackDirections whiteKnight
-            |> List.map (Square.add square)
-            |> List.filter
-                (\s ->
-                    isEmpty s position
-                        || (Piece.color (pieceOn s position) == them)
-                )
-            |> List.map (\to -> Move.make square to)
+    Piece.attackDirections whiteKnight
+        |> List.map (Square.add square)
+        |> List.filter
+            (\s ->
+                isEmpty s position
+                    || (Piece.color (pieceOn s position) == them)
+            )
+        |> List.map (\to -> Move.make square to)
 
 
 kingPseudoMovesFrom : Square -> Position -> List Move
@@ -752,16 +782,16 @@ kingPseudoMovesFrom square position =
         them =
             PieceColor.opposite us
     in
-        (Piece.attackDirections whiteKing
-            |> List.map (Square.add square)
-            |> List.filter
-                (\s ->
-                    isEmpty s position
-                        || (Piece.color (pieceOn s position) == them)
-                )
-            |> List.map (\to -> Move.make square to)
-        )
-            ++ kingCastlePseudoMovesFrom us them square position
+    (Piece.attackDirections whiteKing
+        |> List.map (Square.add square)
+        |> List.filter
+            (\s ->
+                isEmpty s position
+                    || (Piece.color (pieceOn s position) == them)
+            )
+        |> List.map (\to -> Move.make square to)
+    )
+        ++ kingCastlePseudoMovesFrom us them square position
 
 
 kingCastlePseudoMovesFrom :
@@ -779,16 +809,18 @@ kingCastlePseudoMovesFrom us them square position =
             g1 =
                 Square.add f1 Delta.e
         in
-            if
-                isEmpty f1 position
-                    && isEmpty g1 position
-                    && not (sideAttacksSquare them square position)
-                    && not (sideAttacksSquare them f1 position)
-                    && not (sideAttacksSquare them g1 position)
-            then
-                [ Move.makeCastle square g1 ]
-            else
-                []
+        if
+            isEmpty f1 position
+                && isEmpty g1 position
+                && not (sideAttacksSquare them square position)
+                && not (sideAttacksSquare them f1 position)
+                && not (sideAttacksSquare them g1 position)
+        then
+            [ Move.makeCastle square g1 ]
+
+        else
+            []
+
      else
         []
     )
@@ -803,17 +835,19 @@ kingCastlePseudoMovesFrom us them square position =
                     b1 =
                         Square.add c1 Delta.w
                 in
-                    if
-                        isEmpty d1 position
-                            && isEmpty c1 position
-                            && isEmpty b1 position
-                            && not (sideAttacksSquare them square position)
-                            && not (sideAttacksSquare them d1 position)
-                            && not (sideAttacksSquare them c1 position)
-                    then
-                        [ Move.makeCastle square c1 ]
-                    else
-                        []
+                if
+                    isEmpty d1 position
+                        && isEmpty c1 position
+                        && isEmpty b1 position
+                        && not (sideAttacksSquare them square position)
+                        && not (sideAttacksSquare them d1 position)
+                        && not (sideAttacksSquare them c1 position)
+                then
+                    [ Move.makeCastle square c1 ]
+
+                else
+                    []
+
             else
                 []
            )
@@ -854,12 +888,14 @@ slidePseudoMovesFrom from position delta =
                 slidePseudoMovesFromInternal
                     (Square.add to delta)
                     (Move.make from to :: result)
+
             else if (pieceOn to position |> Piece.color) == them then
                 Move.make from to :: result
+
             else
                 result
     in
-        slidePseudoMovesFromInternal (Square.add from delta) []
+    slidePseudoMovesFromInternal (Square.add from delta) []
 
 
 piecePseudoMovesTo : PieceColor -> PieceType -> Square -> Position -> List Move
@@ -868,15 +904,16 @@ piecePseudoMovesTo us pieceType to position =
         ourPiece =
             Piece.make us pieceType
     in
-        Piece.attackDirections ourPiece
-            |> List.map
-                (if Piece.isSlider ourPiece then
-                    scan position to
-                 else
-                    Square.add to
-                )
-            |> List.filter (\s -> pieceOn s position == ourPiece)
-            |> List.map (\from -> Move.make from to)
+    Piece.attackDirections ourPiece
+        |> List.map
+            (if Piece.isSlider ourPiece then
+                scan position to
+
+             else
+                Square.add to
+            )
+        |> List.filter (\s -> pieceOn s position == ourPiece)
+        |> List.map (\from -> Move.make from to)
 
 
 pawnPseudoMovesTo : PieceColor -> Square -> Position -> List Move
@@ -884,6 +921,7 @@ pawnPseudoMovesTo us to position =
     pawnEpCapturePseudoMoves us to position
         ++ (if isEmpty to position then
                 pawnPushPseudoMovesTo us to position
+
             else
                 pawnCapturePseudoMovesTo us to position
            )
@@ -901,33 +939,38 @@ pawnPushPseudoMovesTo us to position =
         push =
             if us == white then
                 Delta.s
+
             else
                 Delta.n
 
         from =
             Square.add to push
     in
-        if pieceOn from position == ourPawn then
-            if Square.isRankTwo from them then
-                List.map
-                    (Move.makePromotion from to)
-                    [ queen, rook, bishop, knight ]
-            else
-                [ Move.make from to ]
-        else if isEmpty from position then
-            let
-                from2 =
-                    Square.add from push
-            in
-                if
-                    Square.isRankTwo from2 us
-                        && (pieceOn from2 position == ourPawn)
-                then
-                    [ Move.make from2 to ]
-                else
-                    []
+    if pieceOn from position == ourPawn then
+        if Square.isRankTwo from them then
+            List.map
+                (Move.makePromotion from to)
+                [ queen, rook, bishop, knight ]
+
+        else
+            [ Move.make from to ]
+
+    else if isEmpty from position then
+        let
+            from2 =
+                Square.add from push
+        in
+        if
+            Square.isRankTwo from2 us
+                && (pieceOn from2 position == ourPawn)
+        then
+            [ Move.make from2 to ]
+
         else
             []
+
+    else
+        []
 
 
 pawnCapturePseudoMovesTo : PieceColor -> Square -> Position -> List Move
@@ -942,21 +985,23 @@ pawnCapturePseudoMovesTo us to position =
         ds =
             if us == white then
                 [ Delta.sw, Delta.se ]
+
             else
                 [ Delta.nw, Delta.ne ]
     in
-        ds
-            |> List.map (Square.add to)
-            |> List.filter (\s -> pieceOn s position == ourPawn)
-            |> List.concatMap
-                (\from ->
-                    if Square.isRankTwo from them then
-                        List.map
-                            (Move.makePromotion from to)
-                            [ queen, rook, bishop, knight ]
-                    else
-                        [ Move.make from to ]
-                )
+    ds
+        |> List.map (Square.add to)
+        |> List.filter (\s -> pieceOn s position == ourPawn)
+        |> List.concatMap
+            (\from ->
+                if Square.isRankTwo from them then
+                    List.map
+                        (Move.makePromotion from to)
+                        [ queen, rook, bishop, knight ]
+
+                else
+                    [ Move.make from to ]
+            )
 
 
 pawnEpCapturePseudoMoves : PieceColor -> Square -> Position -> List Move
@@ -968,18 +1013,20 @@ pawnEpCapturePseudoMoves us to position =
         Just epSquare_ ->
             if epSquare_ /= to then
                 []
+
             else
                 let
                     ds =
                         if us == white then
                             [ Delta.sw, Delta.se ]
+
                         else
                             [ Delta.nw, Delta.ne ]
 
                     ourPawn =
                         Piece.make us pawn
                 in
-                    ds
-                        |> List.map (Square.add to)
-                        |> List.filter (\s -> pieceOn s position == ourPawn)
-                        |> List.map (\from -> Move.makeEp from to)
+                ds
+                    |> List.map (Square.add to)
+                    |> List.filter (\s -> pieceOn s position == ourPawn)
+                    |> List.map (\from -> Move.makeEp from to)

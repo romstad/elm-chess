@@ -154,28 +154,40 @@ attackDirections : Piece -> List SquareDelta
 attackDirections piece =
     if piece == whitePawn then
         [ Delta.nw, Delta.ne ]
+
     else if piece == whiteKnight then
         [ Delta.nnw, Delta.nne, Delta.nww, Delta.nee, Delta.ssw, Delta.sse, Delta.sww, Delta.see ]
+
     else if piece == whiteBishop then
         [ Delta.nw, Delta.ne, Delta.sw, Delta.se ]
+
     else if piece == whiteRook then
         [ Delta.n, Delta.s, Delta.w, Delta.e ]
+
     else if piece == whiteQueen then
         [ Delta.nw, Delta.ne, Delta.sw, Delta.se, Delta.n, Delta.s, Delta.w, Delta.e ]
+
     else if piece == whiteKing then
         [ Delta.nw, Delta.ne, Delta.sw, Delta.se, Delta.n, Delta.s, Delta.w, Delta.e ]
+
     else if piece == blackPawn then
         [ Delta.sw, Delta.se ]
+
     else if piece == blackKnight then
         [ Delta.nnw, Delta.nne, Delta.nww, Delta.nee, Delta.ssw, Delta.sse, Delta.sww, Delta.see ]
+
     else if piece == blackBishop then
         [ Delta.nw, Delta.ne, Delta.sw, Delta.se ]
+
     else if piece == blackRook then
         [ Delta.n, Delta.s, Delta.w, Delta.e ]
+
     else if piece == blackQueen then
         [ Delta.nw, Delta.ne, Delta.sw, Delta.se, Delta.n, Delta.s, Delta.w, Delta.e ]
+
     else if piece == blackKing then
         [ Delta.nw, Delta.ne, Delta.sw, Delta.se, Delta.n, Delta.s, Delta.w, Delta.e ]
+
     else
         []
 
@@ -192,17 +204,17 @@ attackDelta piece from to =
         deltaMax =
             Delta.unwrap Delta.max
     in
-        Maybe.withDefault
-            Nothing
-            (Array.get
-                (unwrap piece
-                    * (2 * deltaMax + 1)
-                    + Square.unwrap to
-                    - Square.unwrap from
-                    + deltaMax
-                )
-                attackDeltas
+    Maybe.withDefault
+        Nothing
+        (Array.get
+            (unwrap piece
+                * (2 * deltaMax + 1)
+                + Square.unwrap to
+                - Square.unwrap from
+                + deltaMax
             )
+            attackDeltas
+        )
 
 
 
@@ -216,6 +228,7 @@ toChar : Piece -> Char
 toChar piece =
     if color piece == PC.white then
         Char.toUpper (PT.toChar (kind piece))
+
     else
         Char.toLower (PT.toChar (kind piece))
 
@@ -231,6 +244,7 @@ fromChar char =
         (make
             (if Char.isUpper char then
                 white
+
              else
                 black
             )
@@ -278,6 +292,7 @@ computeAttackDeltas piece =
                         List.map
                             (\d2 -> ( d, d2 ))
                             (Square.possibleDeltasInDirection d)
+
                     else
                         [ ( d, d ) ]
                 )
@@ -286,16 +301,16 @@ computeAttackDeltas piece =
         deltaMax =
             Delta.unwrap Delta.max
     in
-        Array.toList <|
-            List.foldl
-                (\( d0, d ) result ->
-                    Array.set
-                        (deltaMax + Delta.unwrap d)
-                        (Just d0)
-                        result
-                )
-                (Array.repeat (2 * deltaMax + 1) Nothing)
-                deltasByDirection
+    Array.toList <|
+        List.foldl
+            (\( d0, d ) result ->
+                Array.set
+                    (deltaMax + Delta.unwrap d)
+                    (Just d0)
+                    result
+            )
+            (Array.repeat (2 * deltaMax + 1) Nothing)
+            deltasByDirection
 
 
 attackDeltas : Array (Maybe SquareDelta)

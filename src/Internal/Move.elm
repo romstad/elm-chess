@@ -101,10 +101,11 @@ promotion move =
         p =
             PieceType (and (shiftRightBy 12 (unwrap move)) 7)
     in
-        if p == PieceType.none then
-            Nothing
-        else
-            Just p
+    if p == PieceType.none then
+        Nothing
+
+    else
+        Just p
 
 
 isPromotion : Move -> Bool

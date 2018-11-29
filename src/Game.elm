@@ -1,22 +1,12 @@
-module Game
-    exposing
-        ( Game
-        , empty
-        , fromPgn
-        , toPgn
-        , position
-        , moves
-        , previousMove
-        , nextMove
-        , goToMove
-        , forward
-        , back
-        , toBeginning
-        , toEnd
-        , isAtBeginning
-        , isAtEnd
-        , addMove
-        )
+module Game exposing
+    ( Game
+    , empty
+    , fromPgn, toPgn
+    , position
+    , moves, previousMove, nextMove
+    , goToMove, forward, back, toBeginning, toEnd, isAtBeginning, isAtEnd
+    , addMove
+    )
 
 {-| The `Game` type and related functions.
 

@@ -1,22 +1,10 @@
-module Internal.PieceType
-    exposing
-        ( PieceType(..)
-        , none
-        , pawn
-        , knight
-        , bishop
-        , rook
-        , queen
-        , king
-        , all
-        , promotionPieces
-        , isSlider
-        , fromChar
-        , fromString
-        , toChar
-        , toString
-        , unwrap
-        )
+module Internal.PieceType exposing
+    ( PieceType(..)
+    , none, pawn, knight, bishop, rook, queen, king, all, promotionPieces
+    , isSlider
+    , fromChar, fromString, toChar, toString
+    , unwrap
+    )
 
 {-| This module defines the PieceType type and related functions. A
 PieceType value is basically an uncolored chess piece.
@@ -172,16 +160,22 @@ toChar : PieceType -> Char
 toChar kind =
     if kind == pawn then
         'P'
+
     else if kind == knight then
         'N'
+
     else if kind == bishop then
         'B'
+
     else if kind == rook then
         'R'
+
     else if kind == queen then
         'Q'
+
     else if kind == king then
         'K'
+
     else
         '?'
 
@@ -224,20 +218,26 @@ fromChar char =
         ch =
             Char.toUpper char
     in
-        if ch == 'P' then
-            Just pawn
-        else if ch == 'N' then
-            Just knight
-        else if ch == 'B' then
-            Just bishop
-        else if ch == 'R' then
-            Just rook
-        else if ch == 'Q' then
-            Just queen
-        else if ch == 'K' then
-            Just king
-        else
-            Nothing
+    if ch == 'P' then
+        Just pawn
+
+    else if ch == 'N' then
+        Just knight
+
+    else if ch == 'B' then
+        Just bishop
+
+    else if ch == 'R' then
+        Just rook
+
+    else if ch == 'Q' then
+        Just queen
+
+    else if ch == 'K' then
+        Just king
+
+    else
+        Nothing
 
 
 {-| Tries to convert a string to a PieceType, based on the first character

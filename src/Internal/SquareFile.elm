@@ -52,10 +52,11 @@ fromChar char =
         f_ =
             Char.toCode char - Char.toCode 'a'
     in
-        if f_ >= 0 && f_ < fileCount then
-            Just (SquareFile (f_ + fileMin))
-        else
-            Nothing
+    if f_ >= 0 && f_ < fileCount then
+        Just (SquareFile (f_ + fileMin))
+
+    else
+        Nothing
 
 
 fromString : String -> Maybe SquareFile

@@ -4,6 +4,7 @@ import Internal.BoardDimensions exposing (..)
 import Internal.PieceColor exposing (..)
 
 
+
 {- SquareDelta is essentially the vector between two squares. It's implemented
    as a plain wrapper around Ints, for performance reasons.
 -}
@@ -158,5 +159,6 @@ pawnPush : PieceColor -> SquareDelta
 pawnPush color =
     if color == white then
         n
+
     else
         s

@@ -139,6 +139,7 @@ square ( col, row ) piece sqSize =
             [ Css.backgroundColor
                 (if modBy 2 (col + row) == 0 then
                     Css.rgb 200 200 200
+
                  else
                     Css.rgb 140 140 140
                 )

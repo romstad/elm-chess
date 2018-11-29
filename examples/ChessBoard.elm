@@ -98,25 +98,26 @@ squarePressed s model =
         moves =
             List.filter (\m -> Move.to m == s) model.candidateMoves
     in
-        case List.head moves of
-            Just m ->
-                update (DoMove m) model
+    case List.head moves of
+        Just m ->
+            update (DoMove m) model
 
-            Nothing ->
-                let
-                    newMoves =
-                        Game.position model.game |> Position.movesFrom s
-                in
-                    ( { model
-                        | candidateMoves = newMoves
-                        , selectedSquare =
-                            if List.length newMoves == 0 then
-                                Nothing
-                            else
-                                Just s
-                      }
-                    , Cmd.none
-                    )
+        Nothing ->
+            let
+                newMoves =
+                    Game.position model.game |> Position.movesFrom s
+            in
+            ( { model
+                | candidateMoves = newMoves
+                , selectedSquare =
+                    if List.length newMoves == 0 then
+                        Nothing
+
+                    else
+                        Just s
+              }
+            , Cmd.none
+            )
 
 
 
@@ -167,6 +168,7 @@ square ( col, row ) piece sqSize msg =
             [ Css.backgroundColor
                 (if modBy 2 (col + row) == 0 then
                     Css.rgb 200 200 200
+
                  else
                     Css.rgb 140 140 140
                 )
@@ -200,10 +202,12 @@ squareToCoordinates : Square -> Bool -> ( Int, Int )
 squareToCoordinates square_ isRotated =
     ( if isRotated then
         7 - (square_ |> Square.file |> File.toIndex)
+
       else
         square_ |> Square.file |> File.toIndex
     , if isRotated then
         square_ |> Square.rank |> Rank.toIndex
+
       else
         7 - (square_ |> Square.rank |> Rank.toIndex)
     )

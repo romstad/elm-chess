@@ -52,10 +52,11 @@ fromChar char =
         r =
             Char.toCode char - Char.toCode '1'
     in
-        if r >= 0 && r < rankCount then
-            Just (SquareRank (r + rankMin))
-        else
-            Nothing
+    if r >= 0 && r < rankCount then
+        Just (SquareRank (r + rankMin))
+
+    else
+        Nothing
 
 
 fromString : String -> Maybe SquareRank

@@ -7,6 +7,7 @@ import Internal.SquareFile as File exposing (SquareFile(..))
 import Internal.SquareRank as Rank exposing (SquareRank(..))
 
 
+
 {- Files, ranks and squares are all simple wrappers around Ints.
    Squares are used as indices into board arrays. The board array has a large
    frame of "outside" squares around it, in order to facilitate edge and attack
@@ -100,12 +101,12 @@ fromString string =
         r =
             Rank.fromString (String.dropLeft 1 string)
     in
-        case f of
-            Just f_ ->
-                Maybe.map (make f_) r
+    case f of
+        Just f_ ->
+            Maybe.map (make f_) r
 
-            Nothing ->
-                Nothing
+        Nothing ->
+            Nothing
 
 
 
@@ -121,7 +122,7 @@ compress square =
         r =
             unwrap square // extendedFileCount
     in
-        (f - fileMin) + fileCount * (r - rankMin)
+    (f - fileMin) + fileCount * (r - rankMin)
 
 
 expand : Int -> Square
@@ -133,7 +134,7 @@ expand i =
         r =
             i // fileCount
     in
-        Square (f + fileMin + (r + rankMin) * extendedFileCount)
+    Square (f + fileMin + (r + rankMin) * extendedFileCount)
 
 
 
@@ -146,6 +147,7 @@ isRankTwo : Square -> PieceColor -> Bool
 isRankTwo square color =
     if color == white then
         (square |> rank |> Rank.unwrap) == rankMin + 1
+
     else
         (square |> rank |> Rank.unwrap) == rankMax - 1
 
@@ -182,13 +184,14 @@ squaresInDirection startSquare delta_ =
         squaresInDirectionInternal square acc =
             if isOutside square then
                 acc
+
             else
                 squaresInDirectionInternal
                     (add square delta_)
                     (square :: acc)
     in
-        List.reverse <|
-            squaresInDirectionInternal (add startSquare delta_) []
+    List.reverse <|
+        squaresInDirectionInternal (add startSquare delta_) []
 
 
 
@@ -219,10 +222,11 @@ possibleDeltasInDirection delta_ =
                 deltas =
                     deltasInDirection sq delta_
             in
-                if List.length deltas > List.length result then
-                    deltas
-                else
-                    result
+            if List.length deltas > List.length result then
+                deltas
+
+            else
+                result
         )
         []
         all
