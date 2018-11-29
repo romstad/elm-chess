@@ -1,11 +1,14 @@
-module Internal.BoardDimensions exposing (..)
+module Internal.BoardDimensions exposing
+    ( fileCount, rankCount, fileMin, fileMax, rankMin, rankMax
+    , squareMin, squareMax, extendedFileCount, extendedBoardSize
+    )
 
 {-| This module contains various integer constants specifying the size of
 the chess board and various integer arrays used for move generation,
 attack generation, and so on.
 
-@docs fileCount, rankCount, fileMin, fileMax, rankMin, rankMax,
-squareMin, squareMax, extendedFileCount, extendedBoardSize
+@docs fileCount, rankCount, fileMin, fileMax, rankMin, rankMax
+@docs squareMin, squareMax, extendedFileCount, extendedBoardSize
 
 -}
 

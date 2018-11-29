@@ -1,4 +1,8 @@
-module Move exposing (..)
+module Move exposing
+    ( Move, Variation
+    , from, to, promotion, isPromotion, isCastle, isKingsideCastle, isQueensideCastle, isEp
+    , toUci
+    )
 
 {-| The `Move` and `Variation` data types, and miscellaneus functions
 operating on moves.

@@ -1,14 +1,14 @@
-module Internal.Piece exposing (..)
+module Internal.Piece exposing (Piece(..), all, attackDelta, attackDeltas, attackDirections, blackBishop, blackKing, blackKnight, blackPawn, blackQueen, blackRook, color, computeAttackDeltas, empty, fromChar, fromString, isSlider, kind, make, outside, toChar, toString, unwrap, whiteBishop, whiteKing, whiteKnight, whitePawn, whiteQueen, whiteRook)
 
 {- A `Piece` is a simple wrapper around an Int. -}
 
 import Array exposing (Array)
 import Bitwise exposing (and, or, shiftLeftBy, shiftRightBy)
 import Char
-import Internal.PieceColor as PC exposing (PieceColor(PieceColor), black, white)
+import Internal.PieceColor as PC exposing (PieceColor(..), black, white)
 import Internal.PieceType as PT
     exposing
-        ( PieceType(PieceType)
+        ( PieceType(..)
         , bishop
         , king
         , knight
@@ -33,15 +33,15 @@ type Piece
 unwrap : Piece -> Int
 unwrap piece =
     case piece of
-        Piece piece ->
-            piece
+        Piece piece_ ->
+            piece_
 
 
 {-| Create a piece with the given color and type.
 -}
 make : PieceColor -> PieceType -> Piece
-make color kind =
-    Piece (or (shiftLeftBy 3 (PC.unwrap color)) (PT.unwrap kind))
+make color_ kind_ =
+    Piece (or (shiftLeftBy 3 (PC.unwrap color_)) (PT.unwrap kind_))
 
 
 
@@ -192,17 +192,17 @@ attackDelta piece from to =
         deltaMax =
             Delta.unwrap Delta.max
     in
-    Maybe.withDefault
-        Nothing
-        (Array.get
-            (unwrap piece
-                * (2 * deltaMax + 1)
-                + Square.unwrap to
-                - Square.unwrap from
-                + deltaMax
+        Maybe.withDefault
+            Nothing
+            (Array.get
+                (unwrap piece
+                    * (2 * deltaMax + 1)
+                    + Square.unwrap to
+                    - Square.unwrap from
+                    + deltaMax
+                )
+                attackDeltas
             )
-            attackDeltas
-        )
 
 
 
@@ -286,16 +286,16 @@ computeAttackDeltas piece =
         deltaMax =
             Delta.unwrap Delta.max
     in
-    Array.toList <|
-        List.foldl
-            (\( d0, d ) result ->
-                Array.set
-                    (deltaMax + Delta.unwrap d)
-                    (Just d0)
-                    result
-            )
-            (Array.repeat (2 * deltaMax + 1) Nothing)
-            deltasByDirection
+        Array.toList <|
+            List.foldl
+                (\( d0, d ) result ->
+                    Array.set
+                        (deltaMax + Delta.unwrap d)
+                        (Just d0)
+                        result
+                )
+                (Array.repeat (2 * deltaMax + 1) Nothing)
+                deltasByDirection
 
 
 attackDeltas : Array (Maybe SquareDelta)

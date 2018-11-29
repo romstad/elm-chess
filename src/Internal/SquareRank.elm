@@ -1,4 +1,4 @@
-module Internal.SquareRank exposing (..)
+module Internal.SquareRank exposing (SquareRank(..), all, distance, eight, five, four, fromChar, fromString, isOutside, one, seven, six, three, toChar, toIndex, toString, two, unwrap)
 
 {- A `SquareRank` is a simple wrapper around an `Int`. -}
 
@@ -19,8 +19,8 @@ type SquareRank
 unwrap : SquareRank -> Int
 unwrap rank =
     case rank of
-        SquareRank rank ->
-            rank
+        SquareRank rank_ ->
+            rank_
 
 
 
@@ -52,10 +52,10 @@ fromChar char =
         r =
             Char.toCode char - Char.toCode '1'
     in
-    if r >= 0 && r < rankCount then
-        Just (SquareRank (r + rankMin))
-    else
-        Nothing
+        if r >= 0 && r < rankCount then
+            Just (SquareRank (r + rankMin))
+        else
+            Nothing
 
 
 fromString : String -> Maybe SquareRank

@@ -1,4 +1,8 @@
-module PieceType exposing (..)
+module PieceType exposing
+    ( PieceType
+    , pawn, knight, bishop, rook, queen, king, all, promotionPieces
+    , fromChar, fromString, toChar, toString
+    )
 
 {-| This module defines the `PieceType` type and related functions. A
 `PieceType` value is basically an uncolored chess piece.
@@ -98,10 +102,15 @@ promotionPieces =
 algebraic notation.
 
     toChar pawn == 'P'
+
     toChar knight == 'N'
+
     toChar bishop == 'B'
+
     toChar rook == 'R'
+
     toChar queen == 'Q'
+
     toChar king == 'K'
 
 -}
@@ -114,10 +123,15 @@ toChar =
 corresponding piece letter used in English algebraic notation.
 
     toString pawn == "P"
+
     toString knight == "N"
+
     toString bishop == "B"
+
     toString rook == "R"
+
     toString queen == "Q"
+
     toString king == "K"
 
 -}
@@ -131,7 +145,9 @@ and lowercase letters; returns `Nothing` if the character is not one of the
 piece letters used in English algebraic notation.
 
     fromChar 'P' == Just pawn
+
     fromChar 'r' == Just rook
+
     fromChar 'x' == Nothing
 
 -}
@@ -146,7 +162,9 @@ in the string. Accepts both uppercase and lowercase letters; returns
 algebraic notation.
 
     fromString "k" == Just king
+
     fromString "Qa4+" == Just queen
+
     fromString "x" == Nothing
 
 -}

@@ -1,10 +1,11 @@
-module PgnViewer exposing (..)
+module PgnViewer exposing (Model, Msg(..), board, boardOrError, imgUrlPrefix, init, main, pgnInputBox, pieceImgUrl, square, squareToCoordinates, update, view)
 
+import Browser
 import Css
 import Game exposing (Game)
-import Html exposing (..)
-import Html.Attributes exposing (class, placeholder, rows, cols)
-import Html.Events exposing (onClick, onInput)
+import Html.Styled as Html exposing (..)
+import Html.Styled.Attributes exposing (class, cols, css, placeholder, rows)
+import Html.Styled.Events exposing (onClick, onInput)
 import Piece exposing (Piece)
 import PieceColor
 import PieceType
@@ -14,11 +15,11 @@ import SquareFile as File
 import SquareRank as Rank
 
 
-main : Program Never Model Msg
+main : Program () Model Msg
 main =
-    Html.program
+    Browser.element
         { init = init
-        , view = view
+        , view = view >> toUnstyled
         , update = update
         , subscriptions = \_ -> Sub.none
         }
@@ -32,8 +33,8 @@ type alias Model =
     Maybe Game
 
 
-init : ( Model, Cmd Msg )
-init =
+init : () -> ( Model, Cmd Msg )
+init _ =
     ( Just Game.empty, Cmd.none )
 
 
@@ -114,7 +115,7 @@ pgnInputBox =
 board : Position -> Float -> Html Msg
 board position size =
     Html.div
-        [ styles
+        [ css
             [ Css.width (Css.px size)
             , Css.height (Css.px size)
             , Css.position Css.relative
@@ -134,9 +135,9 @@ board position size =
 square : ( Int, Int ) -> Maybe Piece -> Float -> Html Msg
 square ( col, row ) piece sqSize =
     Html.div
-        [ styles
+        [ css
             [ Css.backgroundColor
-                (if (col + row) % 2 == 0 then
+                (if modBy 2 (col + row) == 0 then
                     Css.rgb 200 200 200
                  else
                     Css.rgb 140 140 140
@@ -152,13 +153,13 @@ square ( col, row ) piece sqSize =
             Nothing ->
                 text ""
 
-            Just piece ->
+            Just piece_ ->
                 div
-                    [ styles
+                    [ css
                         [ Css.position Css.absolute
                         , Css.width (Css.px sqSize)
                         , Css.height (Css.px sqSize)
-                        , Css.backgroundImage (Css.url (pieceImgUrl piece))
+                        , Css.backgroundImage (Css.url (pieceImgUrl piece_))
                         , Css.backgroundSize2 (Css.px sqSize) (Css.px sqSize)
                         ]
                     ]
@@ -167,15 +168,10 @@ square ( col, row ) piece sqSize =
 
 
 squareToCoordinates : Square -> ( Int, Int )
-squareToCoordinates square =
-    ( square |> Square.file |> File.toIndex
-    , 7 - (square |> Square.rank |> Rank.toIndex)
+squareToCoordinates square_ =
+    ( square_ |> Square.file |> File.toIndex
+    , 7 - (square_ |> Square.rank |> Rank.toIndex)
     )
-
-
-styles : List Css.Mixin -> Html.Attribute msg
-styles =
-    Css.asPairs >> Html.Attributes.style
 
 
 pieceImgUrl : Piece -> String

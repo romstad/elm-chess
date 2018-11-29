@@ -1,0 +1,28 @@
+{
+    "type": "package",
+    "name": "romstad/elm-chess",
+    "summary": "Elm library for computer chess",
+    "license": "BSD-3-Clause",
+    "version": "1.1.1",
+    "exposed-modules": [
+        "Game",
+        "Move",
+        "Notation",
+        "Piece",
+        "PieceColor",
+        "PieceType",
+        "Position",
+        "Square",
+        "SquareFile",
+        "SquareRank"
+    ],
+    "elm-version": "0.19.0 <= v < 0.20.0",
+    "dependencies": {
+        "elm/core": "1.0.0 <= v < 2.0.0",
+        "elm/parser": "1.1.0 <= v < 2.0.0"
+    },
+    "test-dependencies": {
+        "elm-explorations/test": "1.1.0 <= v < 2.0.0",
+        "rogeriochaves/elm-test-bdd-style": "6.1.2 <= v < 7.0.0"
+    }
+}

@@ -1,4 +1,10 @@
-module Position exposing (..)
+module Position exposing
+    ( Position
+    , initial
+    , sideToMove, pieceOn, colorOn, isEmpty, epSquare, moveNumber, sideAttacksSquare, isCheck, isCheckmate
+    , moves, movesFrom, doMove
+    , fromFen, toFen, toUci
+    )
 
 {-| This module defines the `Position` data type, which is used to model
 chess positions.
@@ -68,6 +74,7 @@ pieceOn square pos =
     in
     if p == Internal.Piece.empty || p == Internal.Piece.outside then
         Nothing
+
     else
         Just p
 

@@ -4,7 +4,7 @@ import Char
 import Internal.Game as Game exposing (Game, GameResult(..), TagPair)
 import Internal.Move as Move exposing (Move)
 import Internal.Notation as Notation
-import Parser exposing ((|.), (|=), Parser)
+import Parser exposing (..)
 import Set
 
 
@@ -12,6 +12,14 @@ type alias PgnGame =
     { headers : List TagPair
     , moveText : MoveText
     }
+
+
+type alias TagPair =
+    ( String, String )
+
+
+tagPair a b =
+    ( a, b )
 
 
 type alias MoveText =
@@ -27,244 +35,126 @@ type MoveTextItem
     | Termination GameResult
 
 
-gameFromString : String -> Maybe Game
-gameFromString pgnString =
-    fromString pgnString
-        |> Maybe.andThen gameFromPgnGame
-
-
-gameToString : Game -> String
-gameToString game =
-    headersToString game
-        ++ "\n"
-        ++ movesToString game
-        ++ " "
-        ++ resultToString game
-
-
-gameFromPgnGame : PgnGame -> Maybe Game
-gameFromPgnGame g =
-    Game.empty
-        |> (\game ->
-                { game | tags = g.headers, result = result g }
-                    |> Game.addSanMoveSequence
-                        (List.filterMap
-                            (\x ->
-                                case x of
-                                    Move m ->
-                                        Just m
-
-                                    _ ->
-                                        Nothing
-                            )
-                            g.moveText
-                        )
-                    |> Maybe.map Game.toBeginning
-           )
-
-
-tagValue : String -> PgnGame -> Maybe String
-tagValue tagName game =
-    game.headers
-        |> List.filter (\t -> Tuple.first t == tagName)
-        |> List.head
-        |> Maybe.map Tuple.second
-
-
-result : PgnGame -> GameResult
-result game =
-    List.foldl
-        (\x r ->
-            case x of
-                Termination t ->
-                    t
-
-                _ ->
-                    r
-        )
-        UnknownResult
-        game.moveText
-
-
-fromString : String -> Maybe PgnGame
-fromString pgnString =
-    Parser.run pgn pgnString |> Result.toMaybe
-
-
 pgn : Parser PgnGame
 pgn =
-    Parser.succeed PgnGame
+    succeed PgnGame
         |= headers
         |= moveText
 
 
+gameFromString : String -> Maybe Game
+gameFromString pgnString =
+    run pgn pgnString |> Result.toMaybe |> Maybe.andThen gameFromPgnGame_
+
+
+gameToString : Game -> String
+gameToString game =
+    headersToString_ game
+        ++ "\n"
+        ++ movesToString_ game
+        ++ " "
+        ++ resultToString_ game
+
+
+
+-- Headers
+
+
 headers : Parser (List TagPair)
 headers =
-    Parser.repeat Parser.zeroOrMore <|
-        Parser.delayedCommit whitespace tagPair
+    sequence
+        { start = ""
+        , separator = ""
+        , end = ""
+        , spaces = spaces
+        , item = tagPair_
+        , trailing = Optional
+        }
+
+
+
+-- Moves
 
 
 moveText : Parser MoveText
 moveText =
-    Parser.repeat Parser.zeroOrMore <|
-        Parser.succeed identity
-            |. whitespaceOrPeriod
-            |= moveTextItem
-
-
-tagPair : Parser TagPair
-tagPair =
-    Parser.succeed (,)
-        |. Parser.symbol "["
-        |= symbol
-        |. whitespace
-        |= string
-        |. Parser.symbol "]"
+    loop []
+        (\state ->
+            oneOf
+                [ succeed (\item -> Loop (state ++ [ item ]))
+                    |= moveTextItem
+                , succeed (Done state)
+                    |. end
+                , succeed (Loop state)
+                    |. spaces
+                ]
+        )
 
 
 moveTextItem : Parser MoveTextItem
 moveTextItem =
-    Parser.oneOf
-        [ Parser.map Termination termination
-        , Parser.map (\_ -> MoveNumber) moveNumber
-        , Parser.map Move move
-        , Parser.map Comment comment
-        , Parser.map Nag nag
-        , Parser.succeed Variation
-            |. Parser.symbol "("
-            |= Parser.lazy (\_ -> moveText)
-            |. Parser.symbol ")"
+    oneOf
+        [ map Comment comment
+        , map Termination termination
+        , map (\_ -> MoveNumber) moveNumber
+        , map Nag nag
+        , variation
+        , map Move move
         ]
 
 
-termination : Parser GameResult
-termination =
-    Parser.oneOf
-        [ Parser.succeed WhiteWins |. Parser.symbol "1-0"
-        , Parser.succeed BlackWins |. Parser.symbol "0-1"
-        , Parser.succeed Draw |. Parser.symbol "1/2-1/2"
-        , Parser.succeed UnknownResult |. Parser.symbol "*"
-        ]
+variation : Parser MoveTextItem
+variation =
+    sequence
+        { start = "("
+        , separator = ""
+        , end = ")"
+        , spaces = spaces
+        , item = lazy (\_ -> moveTextItem)
+        , trailing = Optional
+        }
+        |> andThen (Variation >> succeed)
 
 
-moveNumber : Parser ()
+moveNumber : Parser Int
 moveNumber =
-    Parser.succeed ()
-        |. Parser.ignore Parser.oneOrMore Char.isDigit
+    succeed identity
+        |= digits_
+        |. symbol "."
 
 
 move : Parser String
 move =
-    symbol
+    nonwhitespaceNonparen_ |> andThen disallowBlank_
 
 
 comment : Parser String
 comment =
-    Parser.succeed identity
-        |. Parser.symbol "{"
-        |= Parser.keep Parser.zeroOrMore ((/=) '}')
-        |. Parser.symbol "}"
+    succeed identity
+        |. symbol "{"
+        |= anyCharBut_ '}'
+        |. symbol "}"
 
 
 nag : Parser Int
 nag =
-    Parser.succeed identity
-        |. Parser.symbol "$"
-        |= Parser.int
+    succeed identity
+        |. symbol "$"
+        |= int
 
 
-string : Parser String
-string =
-    Parser.succeed (List.foldr (++) "")
-        |. Parser.symbol "\""
-        |= Parser.repeat
-            Parser.zeroOrMore
-            (Parser.oneOf
-                [ escapedChar
-                , Parser.keep Parser.oneOrMore (\c -> c /= '"' && c /= '\\')
-                ]
-            )
-        |. Parser.symbol "\""
+termination : Parser GameResult
+termination =
+    oneOf
+        [ succeed WhiteWins |. keyword "1-0"
+        , succeed BlackWins |. keyword "0-1"
+        , succeed Draw |. keyword "1/2-1/2"
+        , succeed UnknownResult |. symbol "*"
+        ]
 
 
-escapedChar : Parser String
-escapedChar =
-    Parser.succeed identity
-        |. Parser.symbol "\\"
-        |= Parser.oneOf
-            [ Parser.map (\_ -> "\"") (Parser.symbol "\"")
-            , Parser.map (\_ -> "\\") (Parser.symbol "\\")
-            ]
 
-
-symbol : Parser String
-symbol =
-    Parser.succeed (++)
-        |= Parser.keep (Parser.Exactly 1) isSymbolStart
-        |= Parser.keep (Parser.AtLeast 0) isSymbolContinuation
-
-
-isSymbolStart : Char -> Bool
-isSymbolStart char =
-    Char.isUpper char
-        || Char.isLower char
-        || Char.isDigit char
-
-
-isSymbolContinuation : Char -> Bool
-isSymbolContinuation char =
-    isSymbolStart char
-        || Set.member
-            char
-            (Set.fromList [ '_', '+', '#', '=', ':', '-', '/' ])
-
-
-whitespace : Parser ()
-whitespace =
-    Parser.ignore Parser.zeroOrMore <|
-        \c -> c == ' ' || c == '\n'
-
-
-whitespaceOrPeriod : Parser ()
-whitespaceOrPeriod =
-    Parser.ignore Parser.zeroOrMore <|
-        \c -> c == ' ' || c == '\n' || c == '.'
-
-
-headersToString : Game -> String
-headersToString game =
-    List.foldl
-        (\t result -> result ++ headerToString t)
-        ""
-        game.tags
-
-
-headerToString : TagPair -> String
-headerToString ( name, value ) =
-    "[" ++ name ++ " " ++ "\"" ++ value ++ "\"" ++ "]" ++ "\n"
-
-
-movesToString : Game -> String
-movesToString game =
-    Notation.variationToSan
-        (Game.moves game)
-        (game |> Game.toBeginning |> Game.position)
-
-
-resultToString : Game -> String
-resultToString game =
-    case game.result of
-        UnknownResult ->
-            "*"
-
-        WhiteWins ->
-            "1-0"
-
-        BlackWins ->
-            "0-1"
-
-        Draw ->
-            "1/2-1/2"
+-- Example
 
 
 examplePgn : String
@@ -287,6 +177,142 @@ hxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5
 Nf2 42. g4 Bd3 43. Re6 1/2-1/2"""
 
 
-moves : Game -> List Move
-moves game =
-    Game.moves game
+
+-- Helpers
+
+
+anyCharBut_ char =
+    getChompedString <|
+        succeed identity
+            |. chompWhile ((/=) char)
+
+
+checkMoveNumber_ : String -> Parser Int
+checkMoveNumber_ number =
+    case String.toInt number of
+        Just int ->
+            succeed int
+
+        Nothing ->
+            problem "a move number should be an integer"
+
+
+digits_ : Parser Int
+digits_ =
+    getChompedString (chompWhile Char.isDigit)
+        |> andThen checkMoveNumber_
+
+
+disallowBlank_ : String -> Parser String
+disallowBlank_ string =
+    if string |> String.trim |> String.isEmpty then
+        problem "blank"
+    else
+        succeed string
+
+
+gameFromPgnGame_ : PgnGame -> Maybe Game
+gameFromPgnGame_ g =
+    Game.empty
+        |> (\game ->
+                { game | tags = g.headers, result = result_ g }
+                    |> Game.addSanMoveSequence
+                        (List.filterMap
+                            (\x ->
+                                case x of
+                                    Move m ->
+                                        Just m
+
+                                    _ ->
+                                        Nothing
+                            )
+                            g.moveText
+                        )
+                    |> Maybe.map Game.toBeginning
+           )
+
+
+headerToString_ : TagPair -> String
+headerToString_ ( name, value ) =
+    "[" ++ name ++ " " ++ "\"" ++ value ++ "\"" ++ "]" ++ "\n"
+
+
+headersToString_ : Game -> String
+headersToString_ game =
+    List.foldl
+        (\t result -> result ++ headerToString_ t)
+        ""
+        game.tags
+
+
+isNonwhitespaceChar_ char =
+    char |> String.fromChar |> String.trim |> String.isEmpty |> not
+
+
+movesToString_ : Game -> String
+movesToString_ game =
+    Notation.variationToSan
+        (Game.moves game)
+        (game |> Game.toBeginning |> Game.position)
+
+
+nonspaces_ : Parser String
+nonspaces_ =
+    anyCharBut_ ' '
+
+
+nonwhitespace_ =
+    getChompedString <|
+        succeed identity
+            |. chompWhile (\char -> char |> String.fromChar |> String.trim |> String.isEmpty |> not)
+
+
+nonwhitespaceNonparen_ =
+    getChompedString <|
+        succeed identity
+            |. chompWhile (\char -> isNonwhitespaceChar_ char && char /= ')' && char /= '(')
+
+
+result_ : PgnGame -> GameResult
+result_ game =
+    List.foldl
+        (\x r ->
+            case x of
+                Termination t ->
+                    t
+
+                _ ->
+                    r
+        )
+        UnknownResult
+        game.moveText
+
+
+resultToString_ : Game -> String
+resultToString_ game =
+    case game.result of
+        UnknownResult ->
+            "*"
+
+        WhiteWins ->
+            "1-0"
+
+        BlackWins ->
+            "0-1"
+
+        Draw ->
+            "1/2-1/2"
+
+
+tagPair_ : Parser TagPair
+tagPair_ =
+    succeed tagPair
+        |. symbol "["
+        |. spaces
+        |= nonspaces_
+        |. spaces
+        |. symbol "\""
+        |= anyCharBut_ '"'
+        |. symbol "\""
+        |. spaces
+        |. symbol "]"

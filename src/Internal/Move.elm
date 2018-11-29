@@ -1,10 +1,10 @@
-module Internal.Move exposing (..)
+module Internal.Move exposing (Move(..), Variation, from, isCastle, isEp, isKingsideCastle, isPromotion, isQueensideCastle, make, makeCastle, makeEp, makePromotion, promotion, to, toUci, unwrap)
 
 {- A `Move` is a simple wrapper around an Int. -}
 
 import Bitwise exposing (..)
-import Internal.PieceType as PieceType exposing (PieceType(PieceType))
-import Internal.Square as Square exposing (Square(Square))
+import Internal.PieceType as PieceType exposing (PieceType(..))
+import Internal.Square as Square exposing (Square(..))
 
 
 type Move
@@ -28,8 +28,8 @@ type alias Variation =
 unwrap : Move -> Int
 unwrap move =
     case move of
-        Move move ->
-            move
+        Move move_ ->
+            move_
 
 
 
@@ -37,45 +37,45 @@ unwrap move =
 
 
 make : Square -> Square -> Move
-make from to =
+make from_ to_ =
     Move
         (or
-            (Square.compress to)
-            (shiftLeftBy 6 (Square.compress from))
+            (Square.compress to_)
+            (shiftLeftBy 6 (Square.compress from_))
         )
 
 
 makePromotion : Square -> Square -> PieceType -> Move
-makePromotion from to promotion =
+makePromotion from_ to_ promotion_ =
     Move
         (or
             (or
-                (Square.compress to)
-                (shiftLeftBy 6 (Square.compress from))
+                (Square.compress to_)
+                (shiftLeftBy 6 (Square.compress from_))
             )
-            (shiftLeftBy 12 (PieceType.unwrap promotion))
+            (shiftLeftBy 12 (PieceType.unwrap promotion_))
         )
 
 
 makeCastle : Square -> Square -> Move
-makeCastle from to =
+makeCastle from_ to_ =
     Move
         (or
             (or
-                (Square.compress to)
-                (shiftLeftBy 6 (Square.compress from))
+                (Square.compress to_)
+                (shiftLeftBy 6 (Square.compress from_))
             )
             (shiftLeftBy 15 1)
         )
 
 
 makeEp : Square -> Square -> Move
-makeEp from to =
+makeEp from_ to_ =
     Move
         (or
             (or
-                (Square.compress to)
-                (shiftLeftBy 6 (Square.compress from))
+                (Square.compress to_)
+                (shiftLeftBy 6 (Square.compress from_))
             )
             (shiftLeftBy 16 1)
         )
@@ -101,10 +101,10 @@ promotion move =
         p =
             PieceType (and (shiftRightBy 12 (unwrap move)) 7)
     in
-    if p == PieceType.none then
-        Nothing
-    else
-        Just p
+        if p == PieceType.none then
+            Nothing
+        else
+            Just p
 
 
 isPromotion : Move -> Bool

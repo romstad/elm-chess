@@ -1,4 +1,4 @@
-module Internal.PieceColor exposing (..)
+module Internal.PieceColor exposing (PieceColor(..), all, black, empty, fromChar, fromString, opposite, outside, toChar, toString, unwrap, white)
 
 import Bitwise
 
@@ -11,14 +11,15 @@ type PieceColor
 functions. You should almost certainly not use this in any external code.
 
     unwrap white == 0
+
     unwrap black == 1
 
 -}
 unwrap : PieceColor -> Int
 unwrap color =
     case color of
-        PieceColor color ->
-            color
+        PieceColor color_ ->
+            color_
 
 
 {-| The color of a white piece.
@@ -63,6 +64,7 @@ all =
 black.
 
     opposite white == black
+
     opposite black == white
 
 -}
@@ -75,6 +77,7 @@ opposite =
 in Forsyth-Edwards notation.
 
     toChar white == 'w'
+
     toChar black == 'b'
 
 -}
@@ -92,6 +95,7 @@ toChar color =
 board in Forsyth-Edwards notation.
 
     toChar white == "w"
+
     toChar black == "b"
 
 -}

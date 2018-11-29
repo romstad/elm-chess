@@ -1,4 +1,9 @@
-module PieceColor exposing (..)
+module PieceColor exposing
+    ( PieceColor
+    , white, black, all
+    , opposite
+    , fromChar, fromString, toChar, toString
+    )
 
 {-| This module defines the PieceColor type and related functions.
 
@@ -60,6 +65,7 @@ all =
 {-| The opposite of a color.
 
     opposite white == black
+
     opposite black == white
 
 -}
@@ -72,6 +78,7 @@ opposite =
 board in Forsyth-Edwards notation.
 
     toChar white == 'w'
+
     toChar black == 'b'
 
 -}
@@ -84,6 +91,7 @@ toChar =
 `Char` of the form used when representing a board in Forsyth-Edwards notation.
 
     toChar white == "w"
+
     toChar black == "b"
 
 -}

@@ -1,4 +1,9 @@
-module SquareRank exposing (..)
+module SquareRank exposing
+    ( SquareRank
+    , fromChar, fromString, toChar, toString
+    , all, one, two, three, four, five, six, seven, eight
+    , distance, toIndex
+    )
 
 {-| The `SquareRank` data type and related functions and definitions.
 
@@ -37,6 +42,7 @@ type alias SquareRank =
 {-| Converts a `SquareRank` to a `Char` in the range 1-8.
 
     toChar three == '3'
+
     List.map toChar all == [ '1', '2', '3', '4', '5', '6', '7', '8' ]
 
 -}
@@ -49,6 +55,7 @@ toChar =
 letter in the range 1-8.
 
     toString three == "3"
+
     List.map toString all == [ "1", "2", "3", "4", "5", "6", "7", "8" ]
 
 -}
@@ -61,7 +68,8 @@ toString =
 character is not a digit in the range 1-8.
 
     fromChar '5' == Just five
-    List.map fromChar ['1', 'x', '8'] == [ Just one, Nothing, Just eight ]
+
+    List.map fromChar [ '1', 'x', '8' ] == [ Just one, Nothing, Just eight ]
 
 -}
 fromChar : Char -> Maybe SquareRank
@@ -74,7 +82,8 @@ character of the string. Returns `Nothing` if the first character is not a
 digit in the range 1-8.
 
     fromChar '5' == Just five
-    List.map fromChar ['1', 'x', '8'] == [ Just one, Nothing, Just eight ]
+
+    List.map fromChar [ '1', 'x', '8' ] == [ Just one, Nothing, Just eight ]
 
 -}
 fromString : String -> Maybe SquareRank
@@ -148,6 +157,7 @@ eight =
 {-| The vertical distance between two ranks.
 
     distance one eight == 7
+
     distance five three == 2
 
 -}
