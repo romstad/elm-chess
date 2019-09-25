@@ -1,38 +1,4 @@
-module Internal.Pgn exposing
-    ( MoveText
-    , MoveTextItem(..)
-    , PgnGame
-    , TagPair
-    , anyCharBut_
-    , checkMoveNumber_
-    , comment
-    , digits_
-    , disallowBlank_
-    , examplePgn
-    , gameFromPgnGame_
-    , gameFromString
-    , gameToString
-    , headerToString_
-    , headers
-    , headersToString_
-    , isNonwhitespaceChar_
-    , move
-    , moveNumber
-    , moveText
-    , moveTextItem
-    , movesToString_
-    , nag
-    , nonspaces_
-    , nonwhitespaceNonparen_
-    , nonwhitespace_
-    , pgn
-    , resultToString_
-    , result_
-    , tagPair
-    , tagPair_
-    , termination
-    , variation
-    )
+module Internal.Pgn exposing (gameFromString, gameToString)
 
 import Char
 import Internal.Game as Game exposing (Game, GameResult(..), TagPair)
@@ -78,16 +44,16 @@ pgn =
 
 gameFromString : String -> Maybe Game
 gameFromString pgnString =
-    run pgn pgnString |> Result.toMaybe |> Maybe.andThen gameFromPgnGame_
+    run pgn pgnString |> Result.toMaybe |> Maybe.andThen gameFromPgnGame
 
 
 gameToString : Game -> String
 gameToString game =
-    headersToString_ game
+    headersToString game
         ++ "\n"
-        ++ movesToString_ game
+        ++ movesToString game
         ++ " "
-        ++ resultToString_ game
+        ++ resultToString game
 
 
 
@@ -153,20 +119,20 @@ variation =
 moveNumber : Parser Int
 moveNumber =
     succeed identity
-        |= digits_
+        |= digits
         |. symbol "."
 
 
 move : Parser String
 move =
-    nonwhitespaceNonparen_ |> andThen disallowBlank_
+    nonwhitespaceNonparen |> andThen disallowBlank
 
 
 comment : Parser String
 comment =
     succeed identity
         |. symbol "{"
-        |= anyCharBut_ '}'
+        |= anyCharBut '}'
         |. symbol "}"
 
 
@@ -215,14 +181,14 @@ Nf2 42. g4 Bd3 43. Re6 1/2-1/2"""
 -- Helpers
 
 
-anyCharBut_ char =
+anyCharBut char =
     getChompedString <|
         succeed identity
             |. chompWhile ((/=) char)
 
 
-checkMoveNumber_ : String -> Parser Int
-checkMoveNumber_ number =
+checkMoveNumber : String -> Parser Int
+checkMoveNumber number =
     case String.toInt number of
         Just int ->
             succeed int
@@ -231,14 +197,14 @@ checkMoveNumber_ number =
             problem "a move number should be an integer"
 
 
-digits_ : Parser Int
-digits_ =
+digits : Parser Int
+digits =
     getChompedString (chompWhile Char.isDigit)
-        |> andThen checkMoveNumber_
+        |> andThen checkMoveNumber
 
 
-disallowBlank_ : String -> Parser String
-disallowBlank_ string =
+disallowBlank : String -> Parser String
+disallowBlank string =
     if string |> String.trim |> String.isEmpty then
         problem "blank"
 
@@ -246,8 +212,8 @@ disallowBlank_ string =
         succeed string
 
 
-gameFromPgnGame_ : PgnGame -> Maybe Game
-gameFromPgnGame_ g =
+gameFromPgnGame : PgnGame -> Maybe Game
+gameFromPgnGame g =
     Game.empty
         |> (\game ->
                 { game | tags = g.headers, result = result_ g }
@@ -267,45 +233,45 @@ gameFromPgnGame_ g =
            )
 
 
-headerToString_ : TagPair -> String
-headerToString_ ( name, value ) =
+headerToString : TagPair -> String
+headerToString ( name, value ) =
     "[" ++ name ++ " " ++ "\"" ++ value ++ "\"" ++ "]" ++ "\n"
 
 
-headersToString_ : Game -> String
-headersToString_ game =
+headersToString : Game -> String
+headersToString game =
     List.foldl
-        (\t result -> result ++ headerToString_ t)
+        (\t result -> result ++ headerToString t)
         ""
         game.tags
 
 
-isNonwhitespaceChar_ char =
+isNonwhitespaceChar char =
     char |> String.fromChar |> String.trim |> String.isEmpty |> not
 
 
-movesToString_ : Game -> String
-movesToString_ game =
+movesToString : Game -> String
+movesToString game =
     Notation.variationToSan
         (Game.moves game)
         (game |> Game.toBeginning |> Game.position)
 
 
-nonspaces_ : Parser String
-nonspaces_ =
-    anyCharBut_ ' '
+nonspaces : Parser String
+nonspaces =
+    anyCharBut ' '
 
 
-nonwhitespace_ =
+nonwhitespace =
     getChompedString <|
         succeed identity
             |. chompWhile (\char -> char |> String.fromChar |> String.trim |> String.isEmpty |> not)
 
 
-nonwhitespaceNonparen_ =
+nonwhitespaceNonparen =
     getChompedString <|
         succeed identity
-            |. chompWhile (\char -> isNonwhitespaceChar_ char && char /= ')' && char /= '(')
+            |. chompWhile (\char -> isNonwhitespaceChar char && char /= ')' && char /= '(')
 
 
 result_ : PgnGame -> GameResult
@@ -323,8 +289,8 @@ result_ game =
         game.moveText
 
 
-resultToString_ : Game -> String
-resultToString_ game =
+resultToString : Game -> String
+resultToString game =
     case game.result of
         UnknownResult ->
             "*"
@@ -344,10 +310,10 @@ tagPair_ =
     succeed tagPair
         |. symbol "["
         |. spaces
-        |= nonspaces_
+        |= nonspaces
         |. spaces
         |. symbol "\""
-        |= anyCharBut_ '"'
+        |= anyCharBut '"'
         |. symbol "\""
         |. spaces
         |. symbol "]"
