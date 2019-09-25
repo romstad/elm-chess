@@ -181,6 +181,7 @@ Nf2 42. g4 Bd3 43. Re6 1/2-1/2"""
 -- Helpers
 
 
+anyCharBut : Char -> Parser String
 anyCharBut char =
     getChompedString <|
         succeed identity
@@ -246,6 +247,7 @@ headersToString game =
         game.tags
 
 
+isNonwhitespaceChar : Char -> Bool
 isNonwhitespaceChar char =
     char |> String.fromChar |> String.trim |> String.isEmpty |> not
 
@@ -262,12 +264,14 @@ nonspaces =
     anyCharBut ' '
 
 
+nonwhitespace : Parser String
 nonwhitespace =
     getChompedString <|
         succeed identity
             |. chompWhile (\char -> char |> String.fromChar |> String.trim |> String.isEmpty |> not)
 
 
+nonwhitespaceNonparen : Parser String
 nonwhitespaceNonparen =
     getChompedString <|
         succeed identity
