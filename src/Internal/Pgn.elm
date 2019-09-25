@@ -125,7 +125,7 @@ moveNumber =
 
 move : Parser String
 move =
-    nonwhitespaceNonparen |> andThen disallowBlank
+    nonWhitespaceNonParen |> andThen disallowBlank
 
 
 comment : Parser String
@@ -247,8 +247,8 @@ headersToString game =
         game.tags
 
 
-isNonwhitespaceChar : Char -> Bool
-isNonwhitespaceChar char =
+isNonWhitespaceChar : Char -> Bool
+isNonWhitespaceChar char =
     char |> String.fromChar |> String.trim |> String.isEmpty |> not
 
 
@@ -259,23 +259,23 @@ movesToString game =
         (game |> Game.toBeginning |> Game.position)
 
 
-nonspaces : Parser String
-nonspaces =
+nonSpaces : Parser String
+nonSpaces =
     anyCharBut ' '
 
 
-nonwhitespace : Parser String
-nonwhitespace =
+nonWhitespace : Parser String
+nonWhitespace =
     getChompedString <|
         succeed identity
             |. chompWhile (\char -> char |> String.fromChar |> String.trim |> String.isEmpty |> not)
 
 
-nonwhitespaceNonparen : Parser String
-nonwhitespaceNonparen =
+nonWhitespaceNonParen : Parser String
+nonWhitespaceNonParen =
     getChompedString <|
         succeed identity
-            |. chompWhile (\char -> isNonwhitespaceChar char && char /= ')' && char /= '(')
+            |. chompWhile (\char -> isNonWhitespaceChar char && char /= ')' && char /= '(')
 
 
 result_ : PgnGame -> GameResult
@@ -314,7 +314,7 @@ tagPair_ =
     succeed tagPair
         |. symbol "["
         |. spaces
-        |= nonspaces
+        |= nonSpaces
         |. spaces
         |. symbol "\""
         |= anyCharBut '"'
