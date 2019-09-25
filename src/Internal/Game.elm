@@ -87,24 +87,10 @@ position game =
 -}
 moves : Game -> List Move
 moves game =
-    let
-        movesInternal result pos =
-            case Position.lastMove pos of
-                Nothing ->
-                    result
-
-                Just m ->
-                    case Position.parent pos of
-                        Nothing ->
-                            result
-
-                        Just p ->
-                            movesInternal (m :: result) p
-    in
-    game
-        |> toEnd
-        |> position
-        |> movesInternal []
+    game.positions
+        |> Array.map Position.lastMove
+        |> Array.toList
+        |> List.filterMap identity
 
 
 {-| The previous move in the game, i.e. the move that resulted in the

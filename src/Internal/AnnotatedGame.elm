@@ -1,7 +1,5 @@
 module Internal.AnnotatedGame exposing
     ( Game
-    , GameResult(..)
-    , TagPair
     , addMove
     , addSanMove
     , addSanMoveSequence
@@ -21,7 +19,15 @@ module Internal.AnnotatedGame exposing
     )
 
 import Array exposing (Array)
-import Internal.Move as Move exposing (Move)
+import Internal.AnnotatedPgn as Pgn
+    exposing
+        ( GameResult(..)
+        , MoveText
+        , MoveTextItem(..)
+        , PgnGame
+        , TagPair
+        )
+import Internal.Move as Move exposing (Move, Variation)
 import Internal.Notation exposing (fromSan, toSan)
 import Internal.Position as Position exposing (Position)
 import Internal.Util exposing (failableFoldl)
@@ -34,6 +40,7 @@ type alias GameNode =
     , comment : Maybe String
     , precomment : Maybe String
     , nag : Maybe Int
+    , id : Int
     }
 
 
@@ -42,6 +49,7 @@ type alias Game =
     , tags : List TagPair
     , tree : Tree GameNode
     , focus : Zipper GameNode
+    , nodeCount : Int
     }
 
 
@@ -54,24 +62,15 @@ empty =
                 , comment = Nothing
                 , precomment = Nothing
                 , nag = Nothing
+                , id = 0
                 }
     in
     { result = UnknownResult
     , tags = []
     , tree = tree
     , focus = Zipper.fromTree tree
+    , nodeCount = 1
     }
-
-
-type alias TagPair =
-    ( String, String )
-
-
-type GameResult
-    = WhiteWins
-    | BlackWins
-    | Draw
-    | UnknownResult
 
 
 {-| Get the value of a game tag.
@@ -254,6 +253,7 @@ addMove move game =
             , comment = Nothing
             , precomment = Nothing
             , nag = Nothing
+            , id = game.nodeCount
             }
 
         z =
@@ -268,6 +268,7 @@ addMove move game =
     { game
         | tree = Zipper.toTree z
         , focus = Maybe.withDefault z <| Zipper.firstChild z
+        , nodeCount = game.nodeCount + 1
     }
 
 
@@ -288,3 +289,70 @@ move in short algebraic notation, returns Nothing.
 addSanMoveSequence : List String -> Game -> Maybe Game
 addSanMoveSequence sanMoves game =
     failableFoldl addSanMove game sanMoves
+
+
+fromPgnGame : PgnGame -> Game
+fromPgnGame pgnGame =
+    List.foldl
+        addMoveTextItem
+        { empty | tags = pgnGame.headers }
+        pgnGame.moveText
+
+
+addMoveTextItem : MoveTextItem -> Game -> Game
+addMoveTextItem mti game =
+    case mti of
+        Move move ->
+            Maybe.withDefault game (addSanMove move game)
+
+        MoveNumber ->
+            game
+
+        Variation var ->
+            addVariation var game
+
+        Comment cmt ->
+            if isAtBeginning game || not (isAtEnd game) then
+                game
+
+            else
+                addComment cmt game
+
+        Nag nag ->
+            addNag nag game
+
+        Termination t ->
+            { game | result = t }
+
+
+addPreComment : String -> Game -> Game
+addPreComment cmt game =
+    { game
+        | focus =
+            Zipper.mapLabel (\n -> { n | precomment = Just cmt }) game.focus
+    }
+
+
+addComment : String -> Game -> Game
+addComment cmt game =
+    { game
+        | focus =
+            Zipper.mapLabel (\n -> { n | comment = Just cmt }) game.focus
+    }
+
+
+addNag : Int -> Game -> Game
+addNag nag game =
+    { game
+        | focus =
+            Zipper.mapLabel (\n -> { n | nag = Just nag }) game.focus
+    }
+
+
+addVariation : MoveText -> Game -> Game
+addVariation variation game =
+    game
+        |> back
+        |> (\g -> List.foldl addMoveTextItem g variation)
+        |> toBeginningOfVariation
+        |> forward

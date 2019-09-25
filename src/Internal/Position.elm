@@ -1,6 +1,5 @@
 module Internal.Position exposing
-    ( PosRec
-    , Position(..)
+    ( Position
     , bishopPseudoMovesFrom
     , canCastleKingside
     , canCastleQueenside
@@ -27,7 +26,6 @@ module Internal.Position exposing
     , moves
     , movesFrom
     , movesTo
-    , parent
     , pawnCapturePseudoMovesTo
     , pawnCaptures
     , pawnEpCapturePseudoMoves
@@ -53,7 +51,6 @@ module Internal.Position exposing
     , slidePseudoMovesFrom
     , toFen
     , toUci
-    , unwrap
     )
 
 {- The `Position` type is a record representing a position from a chess game. -}
@@ -93,7 +90,7 @@ import Internal.Square as Square exposing (Square(..))
 import Internal.SquareDelta as Delta exposing (SquareDelta)
 
 
-type alias PosRec =
+type alias Position =
     { board : Board -- The current board position
     , sideToMove : PieceColor -- The current side to move
     , whiteKingSquare : Maybe Square -- Square of white's king
@@ -103,25 +100,7 @@ type alias PosRec =
     , rule50Counter : Int -- Moves since last capture or pawn push
     , gamePly : Int -- Number of half moves in the game so far
     , lastMove : Maybe Move -- The last move that was played
-    , parent : Maybe Position -- The position before the last move
     }
-
-
-type Position
-    = Position PosRec
-
-
-
-{- Unwrap to a plain record, for shorter code. Should only be necessary in a
-   few low level functions.
--}
-
-
-unwrap : Position -> PosRec
-unwrap pos =
-    case pos of
-        Position pos_ ->
-            pos_
 
 
 
@@ -133,18 +112,16 @@ unwrap pos =
 
 empty : Position
 empty =
-    Position
-        { board = Board.empty
-        , sideToMove = white
-        , whiteKingSquare = Nothing
-        , blackKingSquare = Nothing
-        , castleRights = CastleRights.empty
-        , epSquare = Nothing
-        , rule50Counter = 0
-        , gamePly = 0
-        , lastMove = Nothing
-        , parent = Nothing
-        }
+    { board = Board.empty
+    , sideToMove = white
+    , whiteKingSquare = Nothing
+    , blackKingSquare = Nothing
+    , castleRights = CastleRights.empty
+    , epSquare = Nothing
+    , rule50Counter = 0
+    , gamePly = 0
+    , lastMove = Nothing
+    }
 
 
 {-| The standard starting position.
@@ -160,14 +137,14 @@ initial =
 -}
 sideToMove : Position -> PieceColor
 sideToMove position =
-    (unwrap position).sideToMove
+    position.sideToMove
 
 
 {-| En passant square, if available.
 -}
 epSquare : Position -> Maybe Square
 epSquare position =
-    (unwrap position).epSquare
+    position.epSquare
 
 
 {-| Whether the given side still have kingside castling rights.
@@ -176,7 +153,7 @@ canCastleKingside : PieceColor -> Position -> Bool
 canCastleKingside side position =
     CastleRights.canCastleKingside
         side
-        (unwrap position).castleRights
+        position.castleRights
 
 
 {-| Whether the given side still have queenside castling rights.
@@ -185,7 +162,7 @@ canCastleQueenside : PieceColor -> Position -> Bool
 canCastleQueenside side position =
     CastleRights.canCastleQueenside
         side
-        (unwrap position).castleRights
+        position.castleRights
 
 
 {-| Get the piece on the given square. In case of an out of range square
@@ -193,7 +170,7 @@ canCastleQueenside side position =
 -}
 pieceOn : Square -> Position -> Piece
 pieceOn square pos =
-    Board.pieceOn square (unwrap pos).board
+    Board.pieceOn square pos.board
 
 
 {-| The color of the piece on the given square.
@@ -207,14 +184,14 @@ colorOn square pos =
 -}
 isEmpty : Square -> Position -> Bool
 isEmpty square pos =
-    Board.isEmpty square (unwrap pos).board
+    Board.isEmpty square pos.board
 
 
 {-| Current move number in the game.
 -}
 moveNumber : Position -> Int
 moveNumber position =
-    (unwrap position).gamePly // 2 + 1
+    position.gamePly // 2 + 1
 
 
 {-| The square of the king for the given side.
@@ -222,24 +199,17 @@ moveNumber position =
 kingSquare : PieceColor -> Position -> Maybe Square
 kingSquare color position =
     if color == white then
-        (unwrap position).whiteKingSquare
+        position.whiteKingSquare
 
     else
-        (unwrap position).blackKingSquare
-
-
-{-| The parent of a position, i.e. the position before the last move was made.
--}
-parent : Position -> Maybe Position
-parent position =
-    (unwrap position).parent
+        position.blackKingSquare
 
 
 {-| The last move made to reach this position
 -}
 lastMove : Position -> Maybe Move
 lastMove position =
-    (unwrap position).lastMove
+    position.lastMove
 
 
 {-| Put the given piece on the given square of the board, and return the
@@ -247,27 +217,20 @@ modified board.
 -}
 putPiece : Piece -> Square -> Position -> Position
 putPiece piece square position =
-    let
-        pos =
-            unwrap position
-    in
     if piece == Piece.whiteKing then
-        Position
-            { pos
-                | board = Board.putPiece piece square pos.board
-                , whiteKingSquare = Just square
-            }
+        { position
+            | board = Board.putPiece piece square position.board
+            , whiteKingSquare = Just square
+        }
 
     else if piece == Piece.blackKing then
-        Position
-            { pos
-                | board = Board.putPiece piece square pos.board
-                , blackKingSquare = Just square
-            }
+        { position
+            | board = Board.putPiece piece square position.board
+            , blackKingSquare = Just square
+        }
 
     else
-        Position
-            { pos | board = Board.putPiece piece square pos.board }
+        { position | board = Board.putPiece piece square position.board }
 
 
 {-| Remove the piece on the given square of the board, and return the modified
@@ -275,11 +238,7 @@ board.
 -}
 removePiece : Square -> Position -> Position
 removePiece square position =
-    let
-        pos =
-            unwrap position
-    in
-    Position { pos | board = Board.removePiece square pos.board }
+    { position | board = Board.removePiece square position.board }
 
 
 {-| Move a piece from one square to another, returing the modified position.
@@ -289,29 +248,23 @@ without a trace.
 movePiece : Square -> Square -> Position -> Position
 movePiece from to position =
     let
-        pos =
-            unwrap position
-
         piece =
             pieceOn from position
     in
     if piece == Piece.whiteKing then
-        Position
-            { pos
-                | board = Board.movePiece from to pos.board
-                , whiteKingSquare = Just to
-            }
+        { position
+            | board = Board.movePiece from to position.board
+            , whiteKingSquare = Just to
+        }
 
     else if piece == Piece.blackKing then
-        Position
-            { pos
-                | board = Board.movePiece from to pos.board
-                , blackKingSquare = Just to
-            }
+        { position
+            | board = Board.movePiece from to position.board
+            , blackKingSquare = Just to
+        }
 
     else
-        Position
-            { pos | board = Board.movePiece from to pos.board }
+        { position | board = Board.movePiece from to position.board }
 
 
 {-| Scan the board from a given start square along a given direction (a square
@@ -321,7 +274,7 @@ found in this direction.
 -}
 scan : Position -> Square -> SquareDelta -> Square
 scan position square delta =
-    Board.scan (unwrap position).board square delta
+    Board.scan position.board square delta
 
 
 {-| Checks that the ray between two colinear squares is clear from obstructions
@@ -329,21 +282,21 @@ along the given direction.
 -}
 lineIsClear : Position -> Square -> Square -> SquareDelta -> Bool
 lineIsClear position from to delta =
-    Board.lineIsClear (unwrap position).board from to delta
+    Board.lineIsClear position.board from to delta
 
 
 {-| Checks whether the piece on square `from` attacks square `to`
 -}
 pieceAttacksSquare : Square -> Square -> Position -> Bool
 pieceAttacksSquare from to position =
-    Board.pieceAttacksSquare from to (unwrap position).board
+    Board.pieceAttacksSquare from to position.board
 
 
 {-| Checks whether the given side attacks the given square.
 -}
 sideAttacksSquare : PieceColor -> Square -> Position -> Bool
 sideAttacksSquare side square position =
-    Board.sideAttacksSquare side square (unwrap position).board
+    Board.sideAttacksSquare side square position.board
 
 
 {-| Checks whether the given side is in check.
@@ -441,52 +394,48 @@ doMove move position =
         piece =
             pieceOn from position
     in
-    case position of
-        Position pos ->
-            Position
-                { board = Board.doMove move pos.board
-                , sideToMove = PieceColor.opposite pos.sideToMove
-                , whiteKingSquare =
-                    if piece == whiteKing then
-                        Just to
+    { board = Board.doMove move position.board
+    , sideToMove = PieceColor.opposite position.sideToMove
+    , whiteKingSquare =
+        if piece == whiteKing then
+            Just to
 
-                    else
-                        pos.whiteKingSquare
-                , blackKingSquare =
-                    if piece == blackKing then
-                        Just to
+        else
+            position.whiteKingSquare
+    , blackKingSquare =
+        if piece == blackKing then
+            Just to
 
-                    else
-                        pos.blackKingSquare
-                , castleRights = CastleRights.doMove move pos.castleRights
-                , epSquare =
-                    if
-                        (piece == whitePawn)
-                            && (Square.subtract to from == Delta.nn)
-                    then
-                        Just (Square.add from Delta.n)
+        else
+            position.blackKingSquare
+    , castleRights = CastleRights.doMove move position.castleRights
+    , epSquare =
+        if
+            (piece == whitePawn)
+                && (Square.subtract to from == Delta.nn)
+        then
+            Just (Square.add from Delta.n)
 
-                    else if
-                        (piece == blackPawn)
-                            && (Square.subtract to from == Delta.ss)
-                    then
-                        Just (Square.add from Delta.s)
+        else if
+            (piece == blackPawn)
+                && (Square.subtract to from == Delta.ss)
+        then
+            Just (Square.add from Delta.s)
 
-                    else
-                        Nothing
-                , rule50Counter =
-                    if
-                        (Piece.kind piece == pawn)
-                            || (pieceOn to position /= Piece.empty)
-                    then
-                        0
+        else
+            Nothing
+    , rule50Counter =
+        if
+            (Piece.kind piece == pawn)
+                || (pieceOn to position /= Piece.empty)
+        then
+            0
 
-                    else
-                        pos.rule50Counter + 1
-                , gamePly = pos.gamePly + 1
-                , lastMove = Just move
-                , parent = Just position
-                }
+        else
+            position.rule50Counter + 1
+    , gamePly = position.gamePly + 1
+    , lastMove = Just move
+    }
 
 
 {-| List of all legal moves.
@@ -627,36 +576,29 @@ fromFen fen =
                 |> List.head
     in
     Just
-        (Position
-            { board = board
-            , sideToMove = Maybe.withDefault white sideToMove_
-            , whiteKingSquare = whiteKingSquare
-            , blackKingSquare = blackKingSquare
-            , castleRights = castleRights
-            , epSquare = epSquare_
-            , rule50Counter = 0
-            , gamePly = 0
-            , lastMove = Nothing
-            , parent = Nothing
-            }
-        )
+        { board = board
+        , sideToMove = Maybe.withDefault white sideToMove_
+        , whiteKingSquare = whiteKingSquare
+        , blackKingSquare = blackKingSquare
+        , castleRights = castleRights
+        , epSquare = epSquare_
+        , rule50Counter = 0
+        , gamePly = 0
+        , lastMove = Nothing
+        }
 
 
 {-| Convert a position to a FEN string
 -}
 toFen : Position -> String
 toFen position =
-    let
-        pos =
-            unwrap position
-    in
-    Board.toFen pos.board
+    Board.toFen position.board
         ++ " "
-        ++ PieceColor.toString pos.sideToMove
+        ++ PieceColor.toString position.sideToMove
         ++ " "
-        ++ CastleRights.toString pos.castleRights
+        ++ CastleRights.toString position.castleRights
         ++ " "
-        ++ (case pos.epSquare of
+        ++ (case position.epSquare of
                 Just s ->
                     Square.toString s
 
@@ -664,9 +606,9 @@ toFen position =
                     "-"
            )
         ++ " "
-        ++ String.fromInt pos.rule50Counter
+        ++ String.fromInt position.rule50Counter
         ++ " "
-        ++ String.fromInt (pos.gamePly // 2 + 1)
+        ++ String.fromInt (position.gamePly // 2 + 1)
 
 
 {-| Convert a position to UCI notation, for sending it to an engine by a
@@ -674,43 +616,7 @@ toFen position =
 -}
 toUci : Position -> String
 toUci position =
-    let
-        toUciHelper : Position -> List Move -> ( Position, List Move )
-        toUciHelper pos moves_ =
-            if (unwrap pos).rule50Counter == 0 then
-                ( pos, moves_ )
-
-            else
-                case parent pos of
-                    Nothing ->
-                        ( pos, moves_ )
-
-                    Just p ->
-                        case lastMove pos of
-                            Nothing ->
-                                ( pos, moves_ )
-
-                            Just move ->
-                                toUciHelper p (move :: moves_)
-
-        ( root, moves__ ) =
-            toUciHelper position []
-    in
-    "position fen "
-        ++ toFen root
-        ++ (if List.length moves__ == 0 then
-                ""
-
-            else
-                " moves "
-                    ++ List.foldr
-                        (++)
-                        ""
-                        (List.intersperse
-                            " "
-                            (List.map Move.toUci moves__)
-                        )
-           )
+    "position fen " ++ toFen position
 
 
 
