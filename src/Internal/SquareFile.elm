@@ -1,4 +1,23 @@
-module Internal.SquareFile exposing (SquareFile(..), a, all, b, c, d, distance, e, f, fromChar, fromString, g, h, isOutside, toChar, toIndex, toString, unwrap)
+module Internal.SquareFile exposing
+    ( SquareFile(..)
+    , a
+    , all
+    , b
+    , c
+    , d
+    , distance
+    , e
+    , f
+    , fromChar
+    , fromString
+    , g
+    , h
+    , isOutside
+    , toChar
+    , toIndex
+    , toString
+    , unwrap
+    )
 
 {- A `SquareFile` is a simple wrapper around an `Int`. -}
 

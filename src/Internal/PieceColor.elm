@@ -1,4 +1,17 @@
-module Internal.PieceColor exposing (PieceColor(..), all, black, empty, fromChar, fromString, opposite, outside, toChar, toString, unwrap, white)
+module Internal.PieceColor exposing
+    ( PieceColor(..)
+    , all
+    , black
+    , empty
+    , fromChar
+    , fromString
+    , opposite
+    , outside
+    , toChar
+    , toString
+    , unwrap
+    , white
+    )
 
 import Bitwise
 

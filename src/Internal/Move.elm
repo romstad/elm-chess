@@ -1,4 +1,21 @@
-module Internal.Move exposing (Move(..), Variation, from, isCastle, isEp, isKingsideCastle, isPromotion, isQueensideCastle, make, makeCastle, makeEp, makePromotion, promotion, to, toUci, unwrap)
+module Internal.Move exposing
+    ( Move(..)
+    , Variation
+    , from
+    , isCastle
+    , isEp
+    , isKingsideCastle
+    , isPromotion
+    , isQueensideCastle
+    , make
+    , makeCastle
+    , makeEp
+    , makePromotion
+    , promotion
+    , to
+    , toUci
+    , unwrap
+    )
 
 {- A `Move` is a simple wrapper around an Int. -}
 

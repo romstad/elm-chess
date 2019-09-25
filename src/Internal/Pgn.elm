@@ -1,4 +1,38 @@
-module Internal.Pgn exposing (MoveText, MoveTextItem(..), PgnGame, TagPair, anyCharBut_, checkMoveNumber_, comment, digits_, disallowBlank_, examplePgn, gameFromPgnGame_, gameFromString, gameToString, headerToString_, headers, headersToString_, isNonwhitespaceChar_, move, moveNumber, moveText, moveTextItem, movesToString_, nag, nonspaces_, nonwhitespaceNonparen_, nonwhitespace_, pgn, resultToString_, result_, tagPair, tagPair_, termination, variation)
+module Internal.Pgn exposing
+    ( MoveText
+    , MoveTextItem(..)
+    , PgnGame
+    , TagPair
+    , anyCharBut_
+    , checkMoveNumber_
+    , comment
+    , digits_
+    , disallowBlank_
+    , examplePgn
+    , gameFromPgnGame_
+    , gameFromString
+    , gameToString
+    , headerToString_
+    , headers
+    , headersToString_
+    , isNonwhitespaceChar_
+    , move
+    , moveNumber
+    , moveText
+    , moveTextItem
+    , movesToString_
+    , nag
+    , nonspaces_
+    , nonwhitespaceNonparen_
+    , nonwhitespace_
+    , pgn
+    , resultToString_
+    , result_
+    , tagPair
+    , tagPair_
+    , termination
+    , variation
+    )
 
 import Char
 import Internal.Game as Game exposing (Game, GameResult(..), TagPair)

@@ -1,4 +1,23 @@
-module Internal.SquareRank exposing (SquareRank(..), all, distance, eight, five, four, fromChar, fromString, isOutside, one, seven, six, three, toChar, toIndex, toString, two, unwrap)
+module Internal.SquareRank exposing
+    ( SquareRank(..)
+    , all
+    , distance
+    , eight
+    , five
+    , four
+    , fromChar
+    , fromString
+    , isOutside
+    , one
+    , seven
+    , six
+    , three
+    , toChar
+    , toIndex
+    , toString
+    , two
+    , unwrap
+    )
 
 {- A `SquareRank` is a simple wrapper around an `Int`. -}
 

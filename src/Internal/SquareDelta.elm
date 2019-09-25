@@ -1,4 +1,32 @@
-module Internal.SquareDelta exposing (SquareDelta(..), add, e, max, multiply, n, ne, nee, negate, nn, nne, nnw, nw, nww, pawnPush, s, se, see, ss, sse, ssw, subtract, sw, sww, unwrap, w, zero)
+module Internal.SquareDelta exposing
+    ( SquareDelta(..)
+    , add
+    , e
+    , max
+    , multiply
+    , n
+    , ne
+    , nee
+    , negate
+    , nn
+    , nne
+    , nnw
+    , nw
+    , nww
+    , pawnPush
+    , s
+    , se
+    , see
+    , ss
+    , sse
+    , ssw
+    , subtract
+    , sw
+    , sww
+    , unwrap
+    , w
+    , zero
+    )
 
 import Internal.BoardDimensions exposing (..)
 import Internal.PieceColor exposing (..)

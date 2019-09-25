@@ -1,4 +1,60 @@
-module Internal.Position exposing (PosRec, Position(..), bishopPseudoMovesFrom, canCastleKingside, canCastleQueenside, colorOn, doMove, empty, epSquare, fromFen, initial, isCheck, isCheckmate, isEmpty, isInCheck, kingCastlePseudoMovesFrom, kingPseudoMovesFrom, kingSquare, knightPseudoMovesFrom, lastMove, lineIsClear, moveGivesCheck, moveGivesCheckmate, moveNumber, movePiece, moves, movesFrom, movesTo, parent, pawnCapturePseudoMovesTo, pawnCaptures, pawnEpCapturePseudoMoves, pawnEpCaptures, pawnPseudoMovesFrom, pawnPseudoMovesTo, pawnPushPseudoMovesTo, pawnPushes, pieceAttacksSquare, pieceOn, piecePseudoMovesTo, pinDirection, pseudoMoveIsLegal, pseudoMovesFrom, pseudoMovesTo, putPiece, queenPseudoMovesFrom, removePiece, rookPseudoMovesFrom, scan, sideAttacksSquare, sideToMove, slidePseudoMovesFrom, toFen, toUci, unwrap)
+module Internal.Position exposing
+    ( PosRec
+    , Position(..)
+    , bishopPseudoMovesFrom
+    , canCastleKingside
+    , canCastleQueenside
+    , colorOn
+    , doMove
+    , empty
+    , epSquare
+    , fromFen
+    , initial
+    , isCheck
+    , isCheckmate
+    , isEmpty
+    , isInCheck
+    , kingCastlePseudoMovesFrom
+    , kingPseudoMovesFrom
+    , kingSquare
+    , knightPseudoMovesFrom
+    , lastMove
+    , lineIsClear
+    , moveGivesCheck
+    , moveGivesCheckmate
+    , moveNumber
+    , movePiece
+    , moves
+    , movesFrom
+    , movesTo
+    , parent
+    , pawnCapturePseudoMovesTo
+    , pawnCaptures
+    , pawnEpCapturePseudoMoves
+    , pawnEpCaptures
+    , pawnPseudoMovesFrom
+    , pawnPseudoMovesTo
+    , pawnPushPseudoMovesTo
+    , pawnPushes
+    , pieceAttacksSquare
+    , pieceOn
+    , piecePseudoMovesTo
+    , pinDirection
+    , pseudoMoveIsLegal
+    , pseudoMovesFrom
+    , pseudoMovesTo
+    , putPiece
+    , queenPseudoMovesFrom
+    , removePiece
+    , rookPseudoMovesFrom
+    , scan
+    , sideAttacksSquare
+    , sideToMove
+    , slidePseudoMovesFrom
+    , toFen
+    , toUci
+    , unwrap
+    )
 
 {- The `Position` type is a record representing a position from a chess game. -}
 

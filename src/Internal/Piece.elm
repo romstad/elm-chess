@@ -1,4 +1,34 @@
-module Internal.Piece exposing (Piece(..), all, attackDelta, attackDeltas, attackDirections, blackBishop, blackKing, blackKnight, blackPawn, blackQueen, blackRook, color, computeAttackDeltas, empty, fromChar, fromString, isSlider, kind, make, outside, toChar, toString, unwrap, whiteBishop, whiteKing, whiteKnight, whitePawn, whiteQueen, whiteRook)
+module Internal.Piece exposing
+    ( Piece(..)
+    , all
+    , attackDelta
+    , attackDeltas
+    , attackDirections
+    , blackBishop
+    , blackKing
+    , blackKnight
+    , blackPawn
+    , blackQueen
+    , blackRook
+    , color
+    , computeAttackDeltas
+    , empty
+    , fromChar
+    , fromString
+    , isSlider
+    , kind
+    , make
+    , outside
+    , toChar
+    , toString
+    , unwrap
+    , whiteBishop
+    , whiteKing
+    , whiteKnight
+    , whitePawn
+    , whiteQueen
+    , whiteRook
+    )
 
 {- A `Piece` is a simple wrapper around an Int. -}
 
