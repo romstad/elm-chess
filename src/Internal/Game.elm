@@ -210,7 +210,7 @@ addMove move game =
 {-| Tries to add a move in short algebraic notation at the current move index.
 Any previous game continuation will be overwritten. If the input string is not
 a legal, unambiguous move in short algebraic notation from the current game
-position, returns nil.
+position, returns Nothing.
 -}
 addSanMove : String -> Game -> Maybe Game
 addSanMove sanMove game =
@@ -221,7 +221,7 @@ addSanMove sanMove game =
 {-| Tries to add a sequence of moves in short algebraic notation at the current
 move index. Any previous game continuation will be overwritten. If one of the
 strings in the input list is not a legal, unambiguous move in short algebraic
-notation, returns nil.
+notation, returns Nothing.
 -}
 addSanMoveSequence : List String -> Game -> Maybe Game
 addSanMoveSequence sanMoves game =
