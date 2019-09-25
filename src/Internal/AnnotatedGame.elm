@@ -6,6 +6,7 @@ module Internal.AnnotatedGame exposing
     , back
     , empty
     , forward
+    , fromPgnString
     , goToMove
     , isAtBeginning
     , isAtEnd
@@ -31,6 +32,7 @@ import Internal.Move as Move exposing (Move, Variation)
 import Internal.Notation exposing (fromSan, toSan)
 import Internal.Position as Position exposing (Position)
 import Internal.Util exposing (failableFoldl)
+import Parser
 import Tree exposing (Tree)
 import Tree.Zipper as Zipper exposing (Zipper)
 
@@ -297,6 +299,11 @@ fromPgnGame pgnGame =
         addMoveTextItem
         { empty | tags = pgnGame.headers }
         pgnGame.moveText
+
+
+fromPgnString : String -> Maybe Game
+fromPgnString pgnString =
+    Parser.run Pgn.pgn pgnString |> Result.toMaybe |> Maybe.map fromPgnGame
 
 
 addMoveTextItem : MoveTextItem -> Game -> Game
