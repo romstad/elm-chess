@@ -165,6 +165,18 @@ goToMove moveIndex game =
         { game | focus = descendant (Zipper.fromTree game.tree) moveIndex }
 
 
+{-| Jump to the node with the given node ID, if it exists. If not, return the
+game unchanged. Perhaps this one should return a `Maybe Game` instead?
+-}
+goToNode : Int -> Game -> Game
+goToNode nodeId game =
+    { game
+        | focus =
+            Maybe.withDefault game.focus <|
+                Zipper.findFromRoot (\n -> n.id == nodeId) game.focus
+    }
+
+
 {-| Are we at the beginning of the game?
 -}
 isAtBeginning : Game -> Bool
@@ -286,7 +298,7 @@ addSanMove sanMove game =
 
 {-| Tries to add a sequence of moves in short algebraic notation at the current
 move index. If one of the strings in the input list is not a legal, unambiguous
-move in short algebraic notation, returns Nothing.
+move in short algebraic notation, returns `Nothing`.
 -}
 addSanMoveSequence : List String -> Game -> Maybe Game
 addSanMoveSequence sanMoves game =
@@ -319,6 +331,7 @@ addMoveTextItem mti game =
             addVariation var game
 
         Comment cmt ->
+            -- TODO: Pre-comments
             if isAtBeginning game || not (isAtEnd game) then
                 game
 
@@ -336,7 +349,9 @@ addPreComment : String -> Game -> Game
 addPreComment cmt game =
     { game
         | focus =
-            Zipper.mapLabel (\n -> { n | precomment = Just cmt }) game.focus
+            Zipper.mapLabel
+                (\n -> { n | precomment = Just cmt })
+                game.focus
     }
 
 
@@ -344,7 +359,9 @@ addComment : String -> Game -> Game
 addComment cmt game =
     { game
         | focus =
-            Zipper.mapLabel (\n -> { n | comment = Just cmt }) game.focus
+            Zipper.mapLabel
+                (\n -> { n | comment = Just cmt })
+                game.focus
     }
 
 
@@ -352,7 +369,9 @@ addNag : Int -> Game -> Game
 addNag nag game =
     { game
         | focus =
-            Zipper.mapLabel (\n -> { n | nag = Just nag }) game.focus
+            Zipper.mapLabel
+                (\n -> { n | nag = Just nag })
+                game.focus
     }
 
 
