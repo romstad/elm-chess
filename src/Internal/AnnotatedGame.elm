@@ -305,13 +305,7 @@ addMove move game =
             , precomment = Nothing
             , nag = Nothing
             , id = game.nodeCount
-            , ply =
-                Maybe.withDefault 1 <|
-                    Maybe.map
-                        (\n -> n.ply + 1)
-                        (Maybe.map Zipper.label
-                            (Zipper.parent game.focus)
-                        )
+            , ply = (Zipper.label game.focus).ply + 1
             }
 
         z =
@@ -506,10 +500,10 @@ moveToMoveText pos node moveNum =
         ++ (if moveNum then
                 [ MoveNumber
                     (if Position.sideToMove pos == PieceColor.white then
-                        String.fromInt node.ply ++ "."
+                        String.fromInt (node.ply // 2 + 1) ++ "."
 
                      else
-                        String.fromInt node.ply ++ "..."
+                        String.fromInt (node.ply // 2 + 1) ++ "..."
                     )
                 ]
 
