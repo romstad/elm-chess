@@ -4,11 +4,17 @@ module Internal.AnnotatedGame exposing
     , addSanMove
     , addSanMoveSequence
     , back
+    , buildMoveText
+    , children
+    , continuations
     , empty
+    , examplePgn
     , forward
+    , fromPgn
     , fromPgnString
     , goToMove
     , isAtBeginning
+    , isAtBeginningOfVariation
     , isAtEnd
     , moves
     , nextMove
@@ -16,7 +22,10 @@ module Internal.AnnotatedGame exposing
     , previousMove
     , tagValue
     , toBeginning
+    , toBeginningOfVariation
     , toEnd
+    , toEndOfVariation
+    , toPgn
     )
 
 import Array exposing (Array)
@@ -30,6 +39,7 @@ import Internal.AnnotatedPgn as Pgn
         )
 import Internal.Move as Move exposing (Move, Variation)
 import Internal.Notation exposing (fromSan, toSan)
+import Internal.PieceColor as PieceColor exposing (PieceColor)
 import Internal.Position as Position exposing (Position)
 import Internal.Util exposing (failableFoldl)
 import Parser
@@ -43,6 +53,7 @@ type alias GameNode =
     , precomment : Maybe String
     , nag : Maybe Int
     , id : Int
+    , ply : Int
     }
 
 
@@ -65,6 +76,7 @@ empty =
                 , precomment = Nothing
                 , nag = Nothing
                 , id = 0
+                , ply = 0
                 }
     in
     { result = UnknownResult
@@ -85,11 +97,36 @@ tagValue tagName game =
         |> Maybe.map Tuple.second
 
 
+lastMove : GameNode -> Move
+lastMove node =
+    Maybe.withDefault (Move.Move 0) (Position.lastMove node.position)
+
+
 {-| The current node in the game tree
 -}
 currentNode : Game -> GameNode
 currentNode game =
     Zipper.label game.focus
+
+
+{-| Children of the current node in the game tree
+-}
+children : Game -> List GameNode
+children game =
+    List.map Tree.label (Zipper.children game.focus)
+
+
+{-| Continuations from the current node in the game tree
+-}
+continuations : Game -> List Move
+continuations game =
+    List.map
+        (\n ->
+            Maybe.withDefault
+                (Move.Move 0)
+                (Position.lastMove n.position)
+        )
+        (children game)
 
 
 {-| The position at the current move of the game.
@@ -268,20 +305,30 @@ addMove move game =
             , precomment = Nothing
             , nag = Nothing
             , id = game.nodeCount
+            , ply =
+                Maybe.withDefault 1 <|
+                    Maybe.map
+                        (\n -> n.ply + 1)
+                        (Maybe.map Zipper.label
+                            (Zipper.parent game.focus)
+                        )
             }
 
         z =
-            if isAtEnd game then
-                Zipper.replaceTree
-                    (Tree.tree (Zipper.label game.focus) [ Tree.singleton node ])
-                    game.focus
-
-            else
-                Zipper.append (Tree.singleton node) game.focus
+            let
+                forest =
+                    Zipper.children game.focus
+            in
+            Zipper.replaceTree
+                (Tree.tree
+                    (Zipper.label game.focus)
+                    (forest ++ [ Tree.singleton node ])
+                )
+                game.focus
     in
     { game
         | tree = Zipper.toTree z
-        , focus = Maybe.withDefault z <| Zipper.firstChild z
+        , focus = Maybe.withDefault z <| Zipper.lastChild z
         , nodeCount = game.nodeCount + 1
     }
 
@@ -305,44 +352,73 @@ addSanMoveSequence sanMoves game =
     failableFoldl addSanMove game sanMoves
 
 
-fromPgnGame : PgnGame -> Game
-fromPgnGame pgnGame =
-    List.foldl
-        addMoveTextItem
-        { empty | tags = pgnGame.headers }
-        pgnGame.moveText
+fromPgn : PgnGame -> Game
+fromPgn pgnGame =
+    Tuple.first <|
+        List.foldl
+            addMoveTextItem
+            ( { empty | tags = pgnGame.headers }, Nothing )
+            pgnGame.moveText
 
 
 fromPgnString : String -> Maybe Game
 fromPgnString pgnString =
-    Parser.run Pgn.pgn pgnString |> Result.toMaybe |> Maybe.map fromPgnGame
+    Maybe.map fromPgn (Pgn.fromString pgnString)
 
 
-addMoveTextItem : MoveTextItem -> Game -> Game
-addMoveTextItem mti game =
+toPgn : Game -> PgnGame
+toPgn game =
+    { headers = game.tags
+    , moveText =
+        (if Position.sideToMove (position <| toBeginning game) == PieceColor.black then
+            [ MoveNumber "1." ]
+
+         else
+            []
+        )
+            ++ (buildMoveText <|
+                    Zipper.fromTree <|
+                        game.tree
+               )
+            ++ [ Termination game.result ]
+    }
+
+
+addMoveTextItem : MoveTextItem -> ( Game, Maybe String ) -> ( Game, Maybe String )
+addMoveTextItem mti ( game, preCmt ) =
     case mti of
         Move move ->
-            Maybe.withDefault game (addSanMove move game)
+            case preCmt of
+                Nothing ->
+                    ( Maybe.withDefault game (addSanMove move game), Nothing )
 
-        MoveNumber ->
-            game
+                Just pc ->
+                    ( addPreComment pc
+                        (Maybe.withDefault
+                            game
+                            (addSanMove move game)
+                        )
+                    , Nothing
+                    )
+
+        MoveNumber _ ->
+            ( game, preCmt )
 
         Variation var ->
-            addVariation var game
+            ( addVariation var game, Nothing )
 
         Comment cmt ->
-            -- TODO: Pre-comments
             if isAtBeginning game || not (isAtEnd game) then
-                game
+                ( game, Just cmt )
 
             else
-                addComment cmt game
+                ( addComment cmt game, Nothing )
 
         Nag nag ->
-            addNag nag game
+            ( addNag nag game, Nothing )
 
         Termination t ->
-            { game | result = t }
+            ( { game | result = t }, Nothing )
 
 
 addPreComment : String -> Game -> Game
@@ -379,6 +455,101 @@ addVariation : MoveText -> Game -> Game
 addVariation variation game =
     game
         |> back
-        |> (\g -> List.foldl addMoveTextItem g variation)
+        |> (\g -> Tuple.first <| List.foldl addMoveTextItem ( g, Nothing ) variation)
         |> toBeginningOfVariation
+        |> back
         |> forward
+
+
+buildMoveText : Zipper GameNode -> MoveText
+buildMoveText zip =
+    case Zipper.firstChild zip of
+        Nothing ->
+            []
+
+        Just ch ->
+            let
+                pos =
+                    (Zipper.label zip).position
+            in
+            moveToMoveText
+                pos
+                (Zipper.label ch)
+                (Position.sideToMove pos == PieceColor.white)
+                ++ -- Alternative variations
+                   List.map
+                    (\t ->
+                        Variation <|
+                            moveToMoveText pos (Tree.label t) True
+                                ++ buildMoveText (Zipper.fromTree t)
+                    )
+                    (Zipper.siblingsAfterFocus ch)
+                ++ -- Game continuation
+                   buildMoveText ch
+
+
+moveToMoveText : Position -> GameNode -> Bool -> MoveText
+moveToMoveText pos node moveNum =
+    let
+        move =
+            lastMove node
+    in
+    -- Pre-comment
+    (case node.precomment of
+        Nothing ->
+            []
+
+        Just cmt ->
+            [ Comment cmt ]
+    )
+        -- Move number
+        ++ (if moveNum then
+                [ MoveNumber
+                    (if Position.sideToMove pos == PieceColor.white then
+                        String.fromInt node.ply ++ "."
+
+                     else
+                        String.fromInt node.ply ++ "..."
+                    )
+                ]
+
+            else
+                []
+           )
+        -- Move
+        ++ [ Move <| toSan move pos ]
+        -- Numeric Annotation Glyph
+        ++ (case node.nag of
+                Nothing ->
+                    []
+
+                Just nag ->
+                    [ Nag nag ]
+           )
+        -- Comment
+        ++ (case node.comment of
+                Nothing ->
+                    []
+
+                Just cmt ->
+                    [ Comment cmt ]
+           )
+
+
+examplePgn =
+    """[Event "F/S Return Match"]
+[Site "Belgrade, Serbia JUG"]
+[Date "1992.11.04"]
+[Round "29"]
+[White "Fischer, Robert J."]
+[Black "Spassky, Boris V."]
+[Result "1/2-1/2"]
+
+1. e4 e5 (1... c5 2. Nf3 d6) 2. Nf3 Nc6 3. Bb5 a6 {This opening is called the Ruy Lopez.}
+4. Ba4 ({If } 4. Bxc6  dxc6 { visible? } 5. O-O (5. Nxe5 Qd4) f6 {End of var}) Nf6 {After var} 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8 10. d4 Nbd7
+11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 { boring } 15. Nb1 h6 16. Bh4 c5 17. dxe5
+Nxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6
+23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5
+hxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5
+35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6
+Nf2 42. g4 Bd3 43. Re6 1/2-1/2"""

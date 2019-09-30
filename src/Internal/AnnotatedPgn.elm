@@ -25,7 +25,7 @@ type alias MoveText =
 
 type MoveTextItem
     = Move String
-    | MoveNumber
+    | MoveNumber String
     | Variation MoveText
     | Comment String
     | Nag Int
@@ -37,6 +37,18 @@ type GameResult
     | BlackWins
     | Draw
     | UnknownResult
+
+
+fromString : String -> Maybe PgnGame
+fromString str =
+    Result.toMaybe (Parser.run pgn str)
+
+
+toString : PgnGame -> String
+toString game =
+    headersToString game.headers
+        ++ "\n"
+        ++ moveTextToString game.moveText
 
 
 pgn : Parser PgnGame
@@ -86,7 +98,7 @@ moveTextItem =
     oneOf
         [ map Comment comment
         , map Termination termination
-        , map (\_ -> MoveNumber) moveNumber
+        , map MoveNumber moveNumber --(\_ -> MoveNumber) moveNumber
         , map Nag nag
         , variation
         , map Move move
@@ -106,11 +118,13 @@ variation =
         |> andThen (Variation >> succeed)
 
 
-moveNumber : Parser Int
+moveNumber : Parser String
 moveNumber =
-    succeed identity
-        |= digits
-        |. symbol "."
+    variable
+        { start = Char.isDigit
+        , inner = \c -> Char.isDigit c || c == '.'
+        , reserved = Set.fromList []
+        }
 
 
 move : Parser String
@@ -254,3 +268,57 @@ tagPair_ =
         |. symbol "\""
         |. spaces
         |. symbol "]"
+
+
+headersToString : List TagPair -> String
+headersToString pairs =
+    List.foldr (++) "" (List.map headerToString pairs)
+
+
+headerToString : TagPair -> String
+headerToString ( t, v ) =
+    "[" ++ t ++ " \"" ++ v ++ "\"]\n"
+
+
+moveTextToString : MoveText -> String
+moveTextToString mtxt =
+    List.foldr (++)
+        ""
+        (List.intersperse " " (List.map moveTextItemToString mtxt))
+
+
+moveTextItemToString : MoveTextItem -> String
+moveTextItemToString mti =
+    case mti of
+        Move m ->
+            m
+
+        MoveNumber mn ->
+            mn
+
+        Variation var ->
+            "("
+                ++ List.foldr (++)
+                    ""
+                    (List.intersperse " " (List.map moveTextItemToString var))
+                ++ ")"
+
+        Comment cmt ->
+            "{" ++ cmt ++ "}"
+
+        Nag n ->
+            "$" ++ String.fromInt n
+
+        Termination result ->
+            case result of
+                WhiteWins ->
+                    "1-0"
+
+                BlackWins ->
+                    "0-1"
+
+                Draw ->
+                    "1/2-1/2"
+
+                UnknownResult ->
+                    "*"
